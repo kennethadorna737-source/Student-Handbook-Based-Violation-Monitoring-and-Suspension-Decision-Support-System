@@ -1,0 +1,137 @@
+/* dashboard.css - Compact Maroon & Gold Dashboard */
+
+body {
+    background-color: #faf7f2;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    overflow-y: auto; /* allow minimal scroll if needed, but fits on most screens */
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Navbar compact */
+.navbar {
+    background-color: #800000;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    padding: 0.25rem 0.5rem;
+}
+.navbar-brand {
+    color: #FFD700 !important;
+    font-size: 1rem;
+}
+.text-gold {
+    color: #FFD700;
+}
+.btn-outline-gold {
+    color: #FFD700;
+    border-color: #FFD700;
+    font-size: 0.75rem;
+    padding: 0.2rem 0.5rem;
+}
+.btn-outline-gold:hover {
+    background-color: #FFD700;
+    color: #800000;
+}
+
+/* Cards */
+.card {
+    border: none;
+    border-radius: 16px;
+    background: white;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+}
+.card-header {
+    background-color: #800000;
+    color: #FFD700;
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 0.5rem 1rem;
+    border-radius: 16px 16px 0 0 !important;
+}
+.card-header i {
+    margin-right: 6px;
+}
+.card-body {
+    padding: 0.5rem 0.75rem;
+}
+
+/* Summary Cards */
+.summary-card {
+    border-left: 3px solid #FFD700;
+}
+.summary-icon {
+    font-size: 1.6rem;
+    color: #800000;
+    opacity: 0.7;
+}
+.summary-card h3 {
+    font-size: 1.6rem;
+    font-weight: 700;
+}
+.summary-card h6 {
+    font-size: 0.7rem;
+}
+
+/* Charts */
+.chart-card canvas {
+    max-height: 150px;
+    width: 100%;
+}
+
+/* Buttons */
+.btn-maroon {
+    background-color: #800000;
+    color: #FFD700;
+    border-radius: 30px;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: 0.2s;
+}
+.btn-maroon:hover {
+    background-color: #660000;
+    color: #FFE55C;
+}
+.btn-maroon i {
+    margin-right: 4px;
+}
+
+/* Search */
+.search-card .form-control-sm {
+    font-size: 0.75rem;
+}
+#searchResult .alert {
+    border-left: 3px solid #FFD700;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.7rem;
+    margin-top: 6px;
+}
+
+/* Modal consistency */
+.modal-content {
+    border-radius: 20px;
+}
+.modal-header {
+    background-color: #800000;
+    color: #FFD700;
+    border-bottom: 2px solid #FFD700;
+    padding: 0.75rem 1rem;
+}
+.modal-header .btn-close {
+    filter: brightness(0) invert(1);
+}
+.form-select:focus, .form-control:focus {
+    border-color: #FFD700;
+    box-shadow: 0 0 0 0.2rem rgba(255,215,0,0.25);
+}
+
+/* Ensure body fills viewport without overflow */
+.container-fluid {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.row:last-child {
+    margin-bottom: 0;
+}

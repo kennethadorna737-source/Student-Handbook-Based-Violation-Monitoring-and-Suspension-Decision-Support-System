@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Admin Dashboard | PhilTechGMA</title>
+    <!-- Bootstrap 5 + Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- Custom Dashboard CSS -->
+    <link rel="stylesheet" href="styles/dashboard.css">
+</head>
+<body>
+    <!-- Top Navigation (compact) -->
+    <nav class="navbar navbar-expand navbar-dark py-2">
+        <div class="container-fluid px-3">
+            <a class="navbar-brand" href="#">
+                <img src="image/logo.png" alt="Logo" height="32" class="me-2">
+                <span class="fw-bold">PhilTechGMA · Admin</span>
+            </a>
+            <div class="ms-auto">
+                <span class="text-gold me-2 small"><i class="bi bi-person-circle"></i> Admin</span>
+                <a href="login.html" class="btn btn-outline-gold btn-sm py-0">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid px-3 py-2">
+        <!-- Summary Cards Row (compact) -->
+        <div class="row g-2 mb-3">
+            <div class="col-6 col-md-3">
+                <div class="card summary-card">
+                    <div class="card-body py-2 px-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-muted mb-0 small">Total Students</h6>
+                                <h3 class="mb-0" id="totalStudents">0</h3>
+                            </div>
+                            <i class="bi bi-people-fill summary-icon"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card summary-card">
+                    <div class="card-body py-2 px-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-muted mb-0 small">Total Violations</h6>
+                                <h3 class="mb-0" id="totalViolations">0</h3>
+                            </div>
+                            <i class="bi bi-exclamation-triangle-fill summary-icon"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card summary-card">
+                    <div class="card-body py-2 px-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-muted mb-0 small">With Violations</h6>
+                                <h3 class="mb-0" id="studentsWithViolations">0</h3>
+                            </div>
+                            <i class="bi bi-person-warning summary-icon"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card summary-card">
+                    <div class="card-body py-2 px-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-muted mb-0 small">Suspension Eligible</h6>
+                                <h3 class="mb-0" id="eligibleCount">0</h3>
+                            </div>
+                            <i class="bi bi-hourglass-split summary-icon"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row (small graphs) -->
+        <div class="row g-2 mb-3">
+            <div class="col-md-6">
+                <div class="card chart-card">
+                    <div class="card-header bg-maroon text-gold py-2">
+                        <i class="bi bi-bar-chart-steps"></i> Violations Trend (Last 6 Months)
+                    </div>
+                    <div class="card-body py-2">
+                        <canvas id="trendChart" height="150"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card chart-card">
+                    <div class="card-header bg-maroon text-gold py-2">
+                        <i class="bi bi-pie-chart"></i> Violation Distribution
+                    </div>
+                    <div class="card-body py-2">
+                        <canvas id="typeChart" height="150"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons & Search (inline) -->
+        <div class="row g-2">
+            <div class="col-md-8">
+                <div class="card action-card">
+                    <div class="card-header bg-maroon text-gold py-2">
+                        <i class="bi bi-grid-3x3-gap-fill"></i> Quick Actions
+                    </div>
+                    <div class="card-body py-2">
+                        <div class="d-flex flex-wrap gap-1">
+                            <button class="btn btn-maroon btn-sm" data-bs-toggle="modal" data-bs-target="#recordModal"><i class="bi bi-journal-plus"></i> Record</button>
+                            <button class="btn btn-maroon btn-sm" data-bs-toggle="modal" data-bs-target="#historyModal"><i class="bi bi-clock-history"></i> History</button>
+                            <button class="btn btn-maroon btn-sm" data-bs-toggle="modal" data-bs-target="#eligibilityModal"><i class="bi bi-check2-circle"></i> Eligibility</button>
+                            <button class="btn btn-maroon btn-sm" data-bs-toggle="modal" data-bs-target="#reportModal"><i class="bi bi-file-earmark-spreadsheet"></i> Report</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card search-card">
+                    <div class="card-header bg-maroon text-gold py-2">
+                        <i class="bi bi-search"></i> Search Student
+                    </div>
+                    <div class="card-body py-2">
+                        <div class="input-group input-group-sm">
+                            <input type="text" class="form-control form-control-sm" id="searchInput" placeholder="ID or Name">
+                            <button class="btn btn-maroon btn-sm" id="searchBtn">Go</button>
+                        </div>
+                        <div id="searchResult" class="mt-1 small"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== MODALS (unchanged, keep functional) ========== -->
+    <!-- Record Violation Modal -->
+    <div class="modal fade" id="recordModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-maroon text-gold">
+                    <h5 class="modal-title"><i class="bi bi-journal-plus"></i> Record Violation</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="violationForm">
+                        <div class="mb-3">
+                            <label class="form-label">Student</label>
+                            <select class="form-select" id="violationStudentId" required>
+                                <option value="">Select student</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Violation Type</label>
+                            <select class="form-select" id="violationType" required>
+                                <option value="Minor Offense">Minor Offense</option>
+                                <option value="Major Offense">Major Offense</option>
+                                <option value="Grave Offense">Grave Offense</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Date</label>
+                            <input type="date" class="form-control" id="violationDate" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" id="violationDesc" rows="2" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-maroon w-100">Record Violation</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Violation History Modal -->
+    <div class="modal fade" id="historyModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-maroon text-gold">
+                    <h5 class="modal-title"><i class="bi bi-clock-history"></i> Violation History</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <select class="form-select mb-3" id="historyStudentId">
+                        <option value="">Select student</option>
+                    </select>
+                    <div id="historyList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Suspension Eligibility Modal -->
+    <div class="modal fade" id="eligibilityModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-maroon text-gold">
+                    <h5 class="modal-title"><i class="bi bi-check2-circle"></i> Suspension Eligibility</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <select class="form-select mb-3" id="eligibilityStudentId">
+                        <option value="">Select student</option>
+                    </select>
+                    <div id="eligibilityResult" class="alert alert-info"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Generate Report Modal -->
+    <div class="modal fade" id="reportModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-maroon text-gold">
+                    <h5 class="modal-title"><i class="bi bi-file-earmark-spreadsheet"></i> Generate Report</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Report Type</label>
+                        <select class="form-select" id="reportType">
+                            <option value="summary">Violation Summary (All Students)</option>
+                            <option value="byStudent">Violations by Student</option>
+                        </select>
+                    </div>
+                    <div id="reportStudentDiv" class="mb-3 d-none">
+                        <label class="form-label">Select Student</label>
+                        <select class="form-select" id="reportStudentId"></select>
+                    </div>
+                    <button id="generateReportBtn" class="btn btn-maroon w-100">Download CSV</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="scripts/dashboard.js"></script>
+</body>
+</html>

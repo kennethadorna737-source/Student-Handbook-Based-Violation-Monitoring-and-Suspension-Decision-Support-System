@@ -1,0 +1,253 @@
+/* login.css - Professional Admin Theme with Banner Background & Maroon Overlay */
+
+.login-page {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 1rem;
+    background: url('image/banner.jpg') center center / cover no-repeat fixed;
+    background-color: #4a0000; /* fallback */
+}
+
+/* Maroon overlay (instead of black) */
+.login-page::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(128, 0, 0, 0.7); /* maroon with 70% opacity */
+    backdrop-filter: blur(3px); /* optional subtle blur */
+    z-index: 1;
+}
+
+.login-container {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    padding: 0.5rem;
+}
+
+/* Rest of the CSS remains exactly the same as before */
+.login-card {
+    background: #ffffff;
+    border: none;
+    border-radius: 32px;
+    overflow: hidden;
+    box-shadow: 0 30px 50px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 215, 0, 0.15);
+    transition: transform 0.25s ease, box-shadow 0.3s ease;
+    margin: 0 auto;
+}
+
+.login-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 35px 55px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 215, 0, 0.3);
+}
+
+.login-header {
+    background: #800000;
+    color: #FFD700;
+    padding: 2rem 1.5rem 1.8rem;
+    text-align: center;
+    border-bottom: 3px solid #FFD700;
+    position: relative;
+}
+
+.login-header::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #FFD700, #FFD700, transparent);
+}
+
+.login-header h2 {
+    color: #FFD700;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    font-size: 1.9rem;
+    margin-bottom: 0.25rem;
+}
+
+.branch-text {
+    color: #FFD700;
+    font-weight: 500;
+    font-size: 1rem;
+    opacity: 0.95;
+    letter-spacing: 0.3px;
+    background: rgba(0, 0, 0, 0.15);
+    display: inline-block;
+    padding: 0.2rem 1rem;
+    border-radius: 40px;
+    backdrop-filter: blur(2px);
+}
+
+.login-header .opacity-75 {
+    color: #FFF5cc;
+    font-size: 0.85rem;
+}
+
+.login-logo {
+    max-width: 95px;
+    max-height: 85px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
+    padding: 4px;
+    border-radius: 20px;
+    transition: transform 0.2s;
+}
+
+.login-logo:hover {
+    transform: scale(1.02);
+}
+
+.login-body {
+    padding: 2rem 2rem 2.2rem;
+    background: #fff;
+}
+
+.form-floating > label {
+    font-weight: 500;
+    color: #5a3e2e;
+}
+
+.form-floating input {
+    border-radius: 14px;
+    border: 1px solid #e0d6c8;
+    background: #fefef7;
+    transition: all 0.2s;
+    font-weight: 500;
+}
+
+.form-floating input:focus {
+    border-color: #FFD700;
+    box-shadow: 0 0 0 4px rgba(255, 215, 0, 0.2);
+    background: #ffffff;
+}
+
+.password-wrapper {
+    position: relative;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #800000;
+    z-index: 10;
+    font-size: 1.2rem;
+    transition: color 0.2s;
+}
+
+.password-toggle:hover {
+    color: #FFD700;
+}
+
+.form-check-input:checked {
+    background-color: #800000;
+    border-color: #FFD700;
+    box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.3);
+}
+
+.form-check-label {
+    font-weight: 500;
+    color: #2c2b28;
+}
+
+.btn-maroon {
+    background: #800000;
+    color: #FFD700;
+    border: none;
+    border-radius: 40px;
+    padding: 0.85rem 2rem;
+    font-weight: 700;
+    font-size: 1.05rem;
+    letter-spacing: 0.5px;
+    transition: all 0.25s ease-in-out;
+    box-shadow: 0 4px 8px rgba(128, 0, 0, 0.3);
+}
+
+.btn-maroon:hover {
+    background: #5e0000;
+    color: #FFE55C;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 20px rgba(128, 0, 0, 0.4);
+}
+
+.btn-maroon:active {
+    transform: translateY(1px);
+}
+
+.text-muted.text-decoration-none {
+    color: #800000 !important;
+    font-weight: 500;
+    transition: all 0.2s;
+    border-bottom: 1px dashed #FFD700;
+}
+
+.text-muted.text-decoration-none:hover {
+    color: #b32d2d !important;
+    border-bottom-color: #800000;
+}
+
+.invalid-feedback {
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin-top: 0.3rem;
+    display: block;
+    color: #dc3545;
+}
+
+.admin-badge {
+    background: rgba(255, 215, 0, 0.2);
+    color: #FFD700;
+    font-size: 0.7rem;
+    border-radius: 50px;
+    padding: 0.2rem 0.8rem;
+    display: inline-block;
+    margin-top: 6px;
+    font-weight: 600;
+    backdrop-filter: blur(2px);
+}
+
+@media (max-width: 768px) {
+    .login-card {
+        max-width: 95%;
+        border-radius: 28px;
+    }
+    .login-header {
+        padding: 1.5rem 1rem;
+    }
+    .login-header h2 {
+        font-size: 1.6rem;
+    }
+    .login-body {
+        padding: 1.6rem;
+    }
+    .btn-maroon {
+        padding: 0.7rem 1rem;
+        font-size: 1rem;
+    }
+    .login-logo {
+        max-width: 70px;
+    }
+}
+
+@media (max-width: 480px) {
+    .login-body {
+        padding: 1.2rem;
+    }
+    .form-floating input {
+        font-size: 0.9rem;
+    }
+}
