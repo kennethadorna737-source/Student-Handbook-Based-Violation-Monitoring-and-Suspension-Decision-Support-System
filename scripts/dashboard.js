@@ -6,7 +6,8 @@ let students = [
     { id: "S002", name: "Maria Santos", course: "BSCS", year: 2 },
     { id: "S003", name: "Pedro Reyes", course: "BSIS", year: 4 },
     { id: "S004", name: "Ana Lopez", course: "BSIT", year: 1 },
-    { id: "S005", name: "Carlos Mendoza", course: "BSCS", year: 3 }
+    { id: "S005", name: "Carlos Mendoza", course: "BSCS", year: 3 },
+     { id: "S005", name: "adorna", course: "BSCS", year: 3 }
 ];
 
 let violations = [
@@ -15,7 +16,8 @@ let violations = [
     { id: 3, studentId: "S002", type: "Minor Offense", date: "2025-01-28", description: "Disruptive behavior" },
     { id: 4, studentId: "S003", type: "Grave Offense", date: "2025-03-05", description: "Cheating" },
     { id: 5, studentId: "S002", type: "Minor Offense", date: "2025-02-20", description: "Littering" },
-    { id: 6, studentId: "S005", type: "Major Offense", date: "2025-03-12", description: "Vaping on campus" }
+    { id: 6, studentId: "S005", type: "Major Offense", date: "2025-03-12", description: "Vaping on campus" },
+    { id: 7, studentId: "S005", type: "Major Offense", date: "2025-03-12", description: "Vandelism campus" }
 ];
 
 // Helper functions

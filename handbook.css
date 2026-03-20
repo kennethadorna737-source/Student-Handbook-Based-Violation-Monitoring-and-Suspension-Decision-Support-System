@@ -6,68 +6,69 @@
     border: 1px solid #FFD700;
     padding: 1.8rem;
     margin-bottom: 2rem;
+    scroll-margin-top: 20px;
+}
+/* TOC grid layout */
+.toc-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 0.5rem;
 }
 
-.handbook-section h2 {
-    color: #FFD700;
-    font-weight: 600;
-    border-left: 5px solid #FFD700;
-    padding-left: 1rem;
-    margin-bottom: 1.5rem;
-}
-
-.list-gold-bullet {
-    list-style: none;
-    padding-left: 0;
-}
-
-.list-gold-bullet li {
-    margin-bottom: 0.75rem;
-    padding-left: 1.5rem;
-    position: relative;
-    color: rgba(255, 255, 255, 0.9);
-}
-
-.list-gold-bullet li:before {
-    content: "▹";
-    color: #FFD700;
-    position: absolute;
-    left: 0;
-}
-
-.badge-gold {
-    background-color: #FFD700;
-    color: #800000;
-    font-weight: 600;
-    padding: 0.35rem 0.8rem;
-    border-radius: 50px;
-    font-size: 0.8rem;
-}
-
-.back-link {
-    color: #FFD700;
+.toc-item {
+    flex: 1 1 180px;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    border-radius: 16px;
+    padding: 0.9rem 1rem;
     text-decoration: none;
-    font-weight: 500;
-    transition: 0.2s;
-}
-
-.back-link:hover {
     color: #fff;
-    text-decoration: underline;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.95rem;
 }
 
-.violation-table th {
-    background-color: rgba(128, 0, 0, 0.7);
+.toc-item i {
+    color: #FFD700;
+    font-size: 1.1rem;
+    width: 1.5rem;
+}
+
+/* Gold circle bullet */
+.toc-circle {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background-color: #FFD700;
+    border-radius: 50%;
+    flex-shrink: 0;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.toc-item:hover {
+    background: rgba(255, 215, 0, 0.15);
+    border-color: #FFD700;
+    transform: translateY(-2px);
     color: #FFD700;
 }
 
-.violation-table td,
-.violation-table th {
-    border-color: rgba(255, 215, 0, 0.3);
-    vertical-align: middle;
+.toc-item:hover .toc-circle {
+    transform: scale(1.2);
+    background-color: #fff;
 }
 
-/* Reuse outline button style if not defined in landing.css */
+/* Responsive */
+@media (max-width: 768px) {
+    .toc-item {
+        flex: 1 1 100%;
+    }
+}
+/* Outline button style */
 .btn-handbook-outline {
     display: inline-block;
     background: transparent;
@@ -88,4 +89,99 @@
     color: #800000;
     transform: translateY(-3px);
     box-shadow: 0 10px 25px rgba(255, 215, 0, 0.4);
+}
+
+.btn-sm-outline {
+    padding: 0.5rem 1.5rem;
+    font-size: 1rem;
+}
+
+/* Table of Contents */
+.handbook-toc {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(4px);
+    border-radius: 20px;
+    padding: 1.5rem;
+    border: 1px solid rgba(255, 215, 0, 0.4);
+    margin-bottom: 2rem;
+}
+
+.handbook-toc ul {
+    list-style: none;
+    padding-left: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.handbook-toc li {
+    flex: 1 1 200px;
+}
+
+.handbook-toc a {
+    color: #FFD700;
+    text-decoration: none;
+    font-weight: 500;
+    transition: 0.2s;
+    display: inline-block;
+    padding: 0.3rem 0;
+}
+
+.handbook-toc a:hover {
+    color: #fff;
+    transform: translateX(5px);
+}
+
+/* Policy badge */
+.policy-badge {
+    display: inline-block;
+    background: #FFD70020;
+    color: #FFD700;
+    border-radius: 30px;
+    padding: 0.2rem 0.8rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+}
+
+.effective-date {
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.6);
+    border-top: 1px solid rgba(255,215,0,0.3);
+    padding-top: 1rem;
+    margin-top: 1rem;
+}
+
+.glossary-term {
+    font-weight: 600;
+    color: #FFD700;
+}
+
+hr.gold-hr {
+    border-top: 2px solid #FFD700;
+    opacity: 0.5;
+    margin: 1rem 0;
+}
+
+.footer-note {
+    border-top: 1px solid rgba(255,215,0,0.3);
+    padding-top: 1.5rem;
+    margin-top: 1.5rem;
+    font-size: 0.85rem;
+    text-align: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .handbook-section {
+        padding: 1.2rem;
+    }
+    .handbook-section h2 {
+        font-size: 1.4rem;
+    }
+    .handbook-toc ul {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
 }

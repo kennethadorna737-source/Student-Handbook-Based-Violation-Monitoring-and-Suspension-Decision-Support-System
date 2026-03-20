@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PhilTechGMA | Student Handbook</title>
+    <title>PhilTechGMA | Student Handbook 2025</title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Bootstrap CSS -->
@@ -16,138 +16,320 @@
     <link rel="stylesheet" href="styles/handbook.css">
 </head>
 <body>
-    <div class="container py-5">
+    <div class="container py-4 py-md-5">
         <!-- header with logo and navigation -->
         <div class="d-flex flex-wrap align-items-center justify-content-between mb-4">
-            <div class="d-flex align-items-center">
-                <img src="logo.png" alt="PhilTechGMA" class="logo me-3" style="height: 70px;">
-                <h1 class="display-6 fw-bold text-gold mb-0">Student Handbook</h1>
+            <div class="d-flex align-items-center gap-3">
+                <img src="logo.png" alt="PhilTechGMA" class="logo" style="height: 70px;">
+                <div>
+                    <h1 class="display-6 fw-bold text-gold mb-0">Student Handbook</h1>
+                    <div class="text-white-80 small">Academic Year 2025-2026 | Version 2.0</div>
+                </div>
             </div>
             <div class="mt-2 mt-sm-0">
                 <a href="index.html" class="back-link me-4"><i class="fas fa-home me-1"></i> Home</a>
-                <a href="login.html" class="btn-handbook-outline" style="padding: 0.5rem 1.5rem; font-size: 1rem;"><i class="fas fa-lock me-1"></i> Admin Login</a>
+                <a href="login.html" class="btn-handbook-outline btn-sm-outline"><i class="fas fa-lock me-1"></i> Admin Login</a>
             </div>
         </div>
 
+        
+        <!-- Table of Contents (quick nav) -->
+<!-- Table of Contents (quick nav) -->
+<div class="handbook-toc mb-4">
+    <h5 class="text-gold mb-3"><i class="fas fa-list-ul me-2"></i> Quick Navigation</h5>
+    <div class="toc-grid">
+        <a href="#preamble" class="toc-item">
+            <span class="toc-circle"></span>
+            <i class="fas fa-scroll me-2"></i> Preamble
+        </a>
+        <a href="#general-policies" class="toc-item">
+            <span class="toc-circle"></span>
+            <i class="fas fa-gavel me-2"></i> General Policies
+        </a>
+        <a href="#offense-categories" class="toc-item">
+            <span class="toc-circle"></span>
+            <i class="fas fa-exclamation-triangle me-2"></i> Offense Categories
+        </a>
+        <a href="#sanction-matrix" class="toc-item">
+            <span class="toc-circle"></span>
+            <i class="fas fa-table me-2"></i> Sanction Matrix
+        </a>
+        <a href="#cs-policies" class="toc-item">
+            <span class="toc-circle"></span>
+            <i class="fas fa-microchip me-2"></i> CS Dept. Policies
+        </a>
+        <a href="#disciplinary-process" class="toc-item">
+            <span class="toc-circle"></span>
+            <i class="fas fa-balance-scale me-2"></i> Due Process
+        </a>
+        <a href="#retention" class="toc-item">
+            <span class="toc-circle"></span>
+            <i class="fas fa-chart-line me-2"></i> Retention Policy
+        </a>
+        <a href="#glossary" class="toc-item">
+            <span class="toc-circle"></span>
+            <i class="fas fa-book me-2"></i> Glossary
+        </a>
+    </div>
+</div>
+
         <div class="row">
             <div class="col-12">
-                <!-- handbook content based on violation monitoring system -->
-                <div class="handbook-section">
-                    <h2><i class="fas fa-book-open me-2"></i> POLICY</h2>
-                    <p class="text-white-80">Once accepted, a Memorandum of Agreement will
-be discussed and signed.
-A student is expected to be in good academic standing during his entire stay at PHILTECH. Should he/she obtain a substandard academic standing, his/her stay with the institution shall be governed by the following rules or policy of selective retention. <strong class="text-gold">Policy on retention,Violation Monitoring & Suspension Decision Support System</strong>.</p>
+                <!-- PREAMBLE SECTION -->
+                <div id="preamble" class="handbook-section">
+                    <div class="policy-badge">INSTITUTIONAL FRAMEWORK</div>
+                    <h2><i class="fas fa-scroll me-2"></i> Preamble</h2>
+                    <p class="text-white-80">The PhilTechGMA Student Handbook serves as the official codification of policies, standards, and student rights. It is designed to uphold the institution's commitment to academic excellence, discipline, and holistic formation. All students enrolled in any program are bound by the provisions herein. The handbook is complemented by the <strong class="text-gold">Violation Monitoring & Suspension Decision Support System</strong> to ensure consistent, fair, and data-driven implementation of disciplinary measures.</p>
+                    <p class="text-white-80 mt-2">This handbook is effective from the date of issuance and supersedes all previous versions. Any amendments shall be approved by the College President upon recommendation of the Student Discipline Committee.</p>
+                    <div class="effective-date"><i class="far fa-calendar-alt me-1"></i> Last revised: August 2025 | Approved by: Office of Student Affairs</div>
                 </div>
 
-                <div class="handbook-section">
-                    <h2><i class="fas fa-exclamation-triangle me-2"></i> Categories of Offenses</h2>
+                <!-- GENERAL POLICIES (expanded) -->
+                <div id="general-policies" class="handbook-section">
+                    <div class="policy-badge">CODE OF CONDUCT</div>
+                    <h2><i class="fas fa-gavel me-2"></i> General Policies & Student Responsibilities</h2>
                     <div class="row g-4">
+                        <div class="col-md-6">
+                            <ul class="list-gold-bullet">
+                                <li><strong class="text-gold">Attendance & Punctuality:</strong> Students must attend all scheduled classes and official activities. Tardiness exceeding 15 minutes is recorded as absence. A student with 20% unexcused absences per subject shall be subject to probation.</li>
+                                <li><strong class="text-gold">Uniform & Identification:</strong> The official school uniform and ID must be worn at all times inside the campus. Lost IDs must be reported within 24 hours; temporary ID is required.</li>
+                                <li><strong class="text-gold">Classroom Decorum:</strong> Respectful interaction, no use of gadgets for non-academic purposes during class, and adherence to academic integrity are mandatory.</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-gold-bullet">
+                                <li><strong class="text-gold">Campus Property:</strong> Vandalism, theft, or unauthorized use of facilities will result in sanctions including restitution and suspension.</li>
+                                <li><strong class="text-gold">Substance-Free Campus:</strong> Possession, use, or distribution of alcohol, tobacco, or illegal drugs is a grave offense with immediate hearing and potential expulsion.</li>
+                                <li><strong class="text-gold">Anti-Bullying & Harassment:</strong> Any form of physical, verbal, cyber, or sexual harassment is strictly prohibited and shall be investigated with strict confidentiality.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CATEGORIES OF OFFENSES (more details) -->
+                <div id="offense-categories" class="handbook-section">
+                    <div class="policy-badge">CLASSIFICATION OF VIOLATIONS</div>
+                    <h2><i class="fas fa-exclamation-triangle me-2"></i> Categories of Offenses</h2>
+                    <p class="text-white-80">Offenses are classified based on severity, impact on community, and recurrence. The Suspension Decision Support System uses a point-based system: Class A (1 pt), Class B (3 pts), Class C (6 pts). Accumulation of 5 points within a semester triggers automatic review.</p>
+                    <div class="row g-4 mt-2">
                         <div class="col-md-4">
-                            <div class="p-3 rounded-3" style="background: rgba(0,0,0,0.3); border-left: 4px solid #FFD700;">
-                                <h4 class="text-gold fs-5">🔴 Class A – Minor Offenses</h4>
-                                <p class="small text-white-80">First warnings, corrective actions, community service.</p>
+                            <div class="p-3 rounded-3" style="background: rgba(0,0,0,0.35); border-left: 4px solid #FFD700;">
+                                <h4 class="text-gold fs-5"><i class="fas fa-circle-exclamation me-1"></i> Class A – Minor Offenses</h4>
+                                <p class="small text-white-80">Typically result in warnings, reflection, or community service. No suspension unless repeated within the same semester.</p>
                                 <ul class="list-gold-bullet small">
-                                    <li>Habitual tardiness (3+ times/month)</li>
-                                    <li>Improper uniform / ID violation</li>
-                                    <li>Littering inside campus</li>
+                                    <li>Habitual tardiness (3+ incidents/month)</li>
+                                    <li>Improper uniform / ID not displayed</li>
+                                    <li>Littering / eating in non-designated areas</li>
                                     <li>Use of gadgets during class (non-academic)</li>
+                                    <li>Failure to observe queue or corridor noise</li>
                                 </ul>
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <div class="p-3 rounded-3" style="background: rgba(0,0,0,0.3); border-left: 4px solid #FFD700;">
-                                <h4 class="text-gold fs-5">🟠 Class B – Serious Offenses</h4>
-                                <p class="small text-white-80">Probation, parental conference, suspension (1-5 days).</p>
+                            <div class="p-3 rounded-3" style="background: rgba(0,0,0,0.35); border-left: 4px solid #FFD700;">
+                                <h4 class="text-gold fs-5"><i class="fas fa-triangle-exclamation me-1"></i> Class B – Serious Offenses</h4>
+                                <p class="small text-white-80">Probation, parental conference, suspension (1–5 days). Record remains active for two semesters.</p>
                                 <ul class="list-gold-bullet small">
                                     <li>Cheating / plagiarism (first offense)</li>
                                     <li>Unauthorized absence (cutting classes)</li>
-                                    <li>Verbal harassment or disrespect</li>
-                                    <li>Vandalism or minor property damage</li>
+                                    <li>Verbal harassment / disrespect to faculty or staff</li>
+                                    <li>Vandalism / minor property damage</li>
+                                    <li>Falsification of documents (first offense)</li>
+                                    <li>Unauthorized use of school Wi-Fi for prohibited activities</li>
                                 </ul>
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <div class="p-3 rounded-3" style="background: rgba(0,0,0,0.3); border-left: 4px solid #FFD700;">
-                                <h4 class="text-gold fs-5">🔴 Class C – Grave Offenses</h4>
-                                <p class="small text-white-80">Suspension (5-20 days), recommendation for expulsion.</p>
+                            <div class="p-3 rounded-3" style="background: rgba(0,0,0,0.35); border-left: 4px solid #FFD700;">
+                                <h4 class="text-gold fs-5"><i class="fas fa-skull-crossbones me-1"></i> Class C – Grave Offenses</h4>
+                                <p class="small text-white-80">Immediate suspension, hearing, and possible expulsion. Permanent record annotation.</p>
                                 <ul class="list-gold-bullet small">
-                                    <li>Physical assault / bullying</li>
-                                    <li>Cheating (repeat offense)</li>
-                                    <li>Possession of prohibited substances</li>
-                                    <li>Cyber misconduct / hacking attempts</li>
+                                    <li>Physical assault / severe bullying</li>
+                                    <li>Cheating (repeat offense) or large-scale plagiarism</li>
+                                    <li>Possession or distribution of prohibited substances</li>
+                                    <li>Cyber misconduct, hacking, or identity theft</li>
+                                    <li>Sexual harassment or acts of lewdness</li>
+                                    <li>Tampering with institutional records or systems</li>
                                 </ul>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="handbook-section">
-                    <h2><i class="fas fa-gavel me-2"></i> Sanction Matrix & Suspension Guidelines</h2>
+                <!-- SANCTION MATRIX (enhanced) -->
+                <div id="sanction-matrix" class="handbook-section">
+                    <div class="policy-badge">DISCIPLINARY ACTIONS</div>
+                    <h2><i class="fas fa-table-list me-2"></i> Sanction Matrix & Suspension Guidelines</h2>
                     <div class="table-responsive">
-                        <table class="table violation-table text-white">
+                        <table class="table violation-table text-white align-middle">
                             <thead>
                                 <tr>
                                     <th>Offense Category</th>
                                     <th>1st Infraction</th>
                                     <th>2nd Infraction</th>
                                     <th>3rd Infraction</th>
+                                    <th>4th Infraction (if applicable)</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
                                     <td><span class="badge-gold">Class A</span> Minor</td>
-                                    <td>Verbal Warning + Reflection Essay</td>
-                                    <td>Written Warning + 2 Days Community Service</td>
-                                    <td>Parent Conference + 1-Day Suspension</td>
+                                    <td>Verbal Warning + Reflection Essay<br><span class="small text-white-50">(Record only)</span></td>
+                                    <td>Written Warning + 2 Days Community Service<br><span class="small text-white-50">Parent notified</span></td>
+                                    <td>Parent Conference + 1-Day Suspension<br><span class="small text-white-50">Probation (1 month)</span></td>
+                                    <td>3-Day Suspension + 10 hours community service</td>
                                 </tr>
                                 <tr>
                                     <td><span class="badge-gold">Class B</span> Serious</td>
-                                    <td>Probation (1 month) + 3-Day Suspension</td>
-                                    <td>Extended Probation + 5-Day Suspension</td>
-                                    <td>10-Day Suspension & Loss of Privileges</td>
+                                    <td>Probation (1 month) + 3-Day Suspension<br><span class="small text-white-50">Reflection paper</span></td>
+                                    <td>Extended Probation (1 semester) + 5-Day Suspension<br><span class="small text-white-50">Mandatory counseling</span></td>
+                                    <td>10-Day Suspension & Loss of Privileges<br><span class="small text-white-50">Possible dismissal warning</span></td>
+                                    <td>Semester Suspension / Recommendation for Dismissal</td>
                                 </tr>
                                 <tr>
                                     <td><span class="badge-gold">Class C</span> Grave</td>
-                                    <td>Immediate Suspension (10 Days) + Hearing</td>
-                                    <td>Semester Suspension / Recommendation for Dismissal</td>
-                                    <td>Expulsion (permanent record)</td>
+                                    <td>Immediate Suspension (10 Days) + Formal Hearing<br><span class="small text-white-50">Preventive suspension during investigation</span></td>
+                                    <td>Semester Suspension / Mandatory Formation Program</td>
+                                    <td>Expulsion (permanent record & blacklist)</td>
+                                    <td>—</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-                    <p class="text-white-80 mt-3 fst-italic"><i class="fas fa-info-circle me-1 text-gold"></i> The Suspension Decision Support System automatically recommends sanctions based on violation history and category. All decisions are reviewed by the CS Department Discipline Committee.</p>
+                    <p class="text-white-80 mt-3 fst-italic"><i class="fas fa-microchip me-1 text-gold"></i> The <strong>Suspension Decision Support System</strong> automatically calculates cumulative points and suggests sanctions based on history and category. Final approval is by the CS Department Discipline Committee. Students may appeal within 3 working days.</p>
                 </div>
 
-                <div class="handbook-section">
+                <!-- CS DEPARTMENT SPECIFIC POLICIES (detailed) -->
+                <div id="cs-policies" class="handbook-section">
+                    <div class="policy-badge">COMPUTER STUDIES DEPARTMENT</div>
                     <h2><i class="fas fa-microchip me-2"></i> CS Department Specific Policies</h2>
                     <div class="row">
                         <div class="col-md-6">
+                            <h5 class="text-gold fs-6"><i class="fas fa-laptop-code me-1"></i> Laboratory & Network Integrity</h5>
                             <ul class="list-gold-bullet">
-                                <li><strong>Laboratory Misconduct:</strong> Unauthorized software installation, food/drinks inside lab → Class B offense.</li>
-                                <li><strong>Network Abuse:</strong> Bypassing firewalls, accessing restricted content → Class B or C depending on severity.</li>
-                                <li><strong>Code Plagiarism:</strong> First offense: grade deduction + mandatory ethics seminar. Repeat: Class B suspension.</li>
+                                <li><strong>Unauthorized software/hardware:</strong> Installing unlicensed software, tampering with hardware, or bypassing security protocols is a Class B offense (first offense).</li>
+                                <li><strong>Network abuse:</strong> Attempting to hack, access restricted systems, or using VPN to bypass filters results in Class B or C depending on intent.</li>
+                                <li><strong>Food & drinks inside labs:</strong> Strictly prohibited; violation is Class A with community service.</li>
+                                <li><strong>Data privacy breach:</strong> Accessing or sharing confidential data without permission is a Class C offense.</li>
                             </ul>
                         </div>
                         <div class="col-md-6">
+                            <h5 class="text-gold fs-6"><i class="fas fa-code me-1"></i> Academic Integrity & Capstone</h5>
                             <ul class="list-gold-bullet">
-                                <li><strong>Attendance in Capstone/Internship:</strong> Unexcused absences beyond 20% leads to automatic probation.</li>
-                                <li><strong>Academic Dishonesty:</strong> Use of AI without disclosure → treated as plagiarism.</li>
+                                <li><strong>Code plagiarism:</strong> First offense – grade of zero on the requirement + mandatory ethics seminar. Repeat offense – Class B suspension (5 days) and notation on record.</li>
+                                <li><strong>AI misuse:</strong> Submission of AI-generated work without disclosure is treated as plagiarism.</li>
+                                <li><strong>Internship/Capstone attendance:</strong> Unexcused absences beyond 20% of total hours results in automatic probation and possible course failure.</li>
+                                <li><strong>Collaboration violations:</strong> Unauthorized sharing of code or answers during exams is a Class B offense.</li>
                             </ul>
+                        </div>
+                    </div>
+                    <hr class="gold-hr">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h5 class="text-gold fs-6"><i class="fas fa-chart-simple me-1"></i> Monitoring & Reporting</h5>
+                            <p class="text-white-80">All CS faculty are required to submit incident reports via the <strong>Violation Monitoring System</strong> within 24 hours. The system aggregates violations and recommends intervention programs (e.g., ethics seminars, counseling) to promote restorative justice.</p>
                         </div>
                     </div>
                 </div>
 
+                <!-- STUDENT RIGHTS & DISCIPLINARY PROCESS (flow with due process) -->
+                <div id="disciplinary-process" class="handbook-section">
+                    <div class="policy-badge">FAIRNESS & ACCOUNTABILITY</div>
+                    <h2><i class="fas fa-balance-scale me-2"></i> Student Rights & Disciplinary Process</h2>
+                    <p class="text-white-80">Every student is entitled to due process, which includes the right to be informed of the charges, to present evidence, and to appeal. The process follows these steps:</p>
+                    <div class="row g-3 mt-2">
+                        <div class="col-md-3 text-center">
+                            <div class="bg-dark bg-opacity-25 p-3 rounded-4">
+                                <i class="fas fa-file-alt fa-2x text-gold mb-2"></i>
+                                <p class="mb-0 fw-bold">1. Incident Report</p>
+                                <small class="text-white-50">Filed by faculty/staff within 24h</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <div class="bg-dark bg-opacity-25 p-3 rounded-4">
+                                <i class="fas fa-users fa-2x text-gold mb-2"></i>
+                                <p class="mb-0 fw-bold">2. Adviser Review</p>
+                                <small class="text-white-50">Initial assessment & counseling</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <div class="bg-dark bg-opacity-25 p-3 rounded-4">
+                                <i class="fas fa-gavel fa-2x text-gold mb-2"></i>
+                                <p class="mb-0 fw-bold">3. Committee Hearing</p>
+                                <small class="text-white-50">Formal deliberation with student</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <div class="bg-dark bg-opacity-25 p-3 rounded-4">
+                                <i class="fas fa-envelope-open-text fa-2x text-gold mb-2"></i>
+                                <p class="mb-0 fw-bold">4. Sanction & Appeal</p>
+                                <small class="text-white-50">3-day appeal window to Dean</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 p-3 rounded-3" style="background: rgba(255,215,0,0.1); border-left: 3px solid #FFD700;">
+                        <p class="mb-0 text-white-80"><i class="fas fa-info-circle text-gold me-2"></i> <strong>Right to Appeal:</strong> Students may submit a written appeal to the Office of Student Affairs within three (3) working days from receipt of the decision. The decision of the College President after review is final.</p>
+                    </div>
+                </div>
+
+                <!-- RETENTION POLICY -->
+                <div id="retention" class="handbook-section">
+                    <div class="policy-badge">ACADEMIC STANDING</div>
+                    <h2><i class="fas fa-chart-line me-2"></i> Policy on Retention & Good Standing</h2>
+                    <p class="text-white-80">To maintain enrollment, students must meet the following academic retention standards:</p>
+                    <ul class="list-gold-bullet">
+                        <li>Maintain a Cumulative Grade Point Average (CGPA) of at least 2.00 (or equivalent passing grade for all courses).</li>
+                        <li>No more than two (2) failing grades in a semester; otherwise, probation with prescribed remedial plan.</li>
+                        <li>Students on academic probation who fail to meet required GPA after one semester may be dismissed from the program.</li>
+                        <li>Disciplinary probation due to violations may affect eligibility for scholarships, leadership roles, and graduation honors.</li>
+                    </ul>
+                    <p class="text-white-80 mt-2">The Violation Monitoring System integrates academic and disciplinary standing to provide a holistic student record.</p>
+                </div>
+
+                <!-- GLOSSARY OF TERMS -->
+                <div id="glossary" class="handbook-section">
+                    <div class="policy-badge">REFERENCE</div>
+                    <h2><i class="fas fa-book me-2"></i> Glossary of Terms</h2>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><span class="glossary-term">Class A/B/C:</span> Classification of offenses based on severity.</p>
+                            <p><span class="glossary-term">Suspension Decision Support System:</span> Digital tool that recommends sanctions based on violation history and category.</p>
+                            <p><span class="glossary-term">Probation:</span> A period of monitored conduct with specific conditions; further violation may lead to suspension.</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><span class="glossary-term">Community Service:</span> Non-academic duties assigned as restorative sanction (e.g., campus cleanup, assisting in events).</p>
+                            <p><span class="glossary-term">Incident Report:</span> Formal documentation of a violation submitted by a faculty or staff member.</p>
+                            <p><span class="glossary-term">Due Process:</span> The right to a fair hearing, notice of charges, and opportunity to respond before any sanction is finalized.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- footer with additional note and back button -->
                 <div class="handbook-section text-center">
-                    <i class="fas fa-balance-scale fa-2x text-gold mb-2 d-block"></i>
-                    <h2 class="fs-4">Student Rights & Disciplinary Process</h2>
-                    <p class="text-white-80">Every student has the right to due process. The discipline flow: <strong class="text-gold">Incident Report → Evaluation by Adviser → Committee Review → Sanction Recommendation → Appeal Window (3 days)</strong>. The Suspension Decision Support System ensures consistent and fair application of the handbook.</p>
-                    <a href="index.html" class="btn-handbook-outline mt-3 d-inline-flex align-items-center" style="background: transparent; border: 2px solid #FFD700; color: #FFD700;"><i class="fas fa-arrow-left me-2"></i> Back to Homepage</a>
+                    <i class="fas fa-graduation-cap fa-2x text-gold mb-3 d-block"></i>
+                    <h2 class="fs-4">Commitment to Excellence & Integrity</h2>
+                    <p class="text-white-80">This handbook is a living document. Feedback and suggestions may be submitted to the Office of Student Affairs. Together, we uphold the values of honor, discipline, and academic excellence.</p>
+                    <div class="footer-note">
+                        <i class="far fa-copyright me-1"></i> PhilTechGMA - College of Computer Studies | All policies are subject to review by the College Board.
+                    </div>
+                    <a href="index.html" class="btn-handbook-outline mt-4 d-inline-flex align-items-center" style="background: transparent; border: 2px solid #FFD700; color: #FFD700;"><i class="fas fa-arrow-left me-2"></i> Return to Homepage</a>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Separate JavaScript for handbook page -->
-    <script src="js/handbook.js"></script>
+    <!-- Smooth scroll for TOC -->
+    <script>
+        document.querySelectorAll('.handbook-toc a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href').substring(1);
+                const target = document.getElementById(targetId);
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
 </body>
 </html>
