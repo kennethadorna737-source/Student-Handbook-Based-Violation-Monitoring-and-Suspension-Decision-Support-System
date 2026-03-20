@@ -19,6 +19,29 @@ body {
     justify-content: center;
 }
 
+/* ===== NEW HANDBOOK OUTLINE BUTTON ===== */
+.btn-handbook-outline {
+    display: inline-block;
+    background: transparent;
+    color: #FFD700;
+    font-weight: 700;
+    padding: 0.9rem 2rem;
+    border-radius: 50px;
+    text-decoration: none;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+    border: 2px solid #FFD700;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(255, 215, 0, 0.2);
+}
+
+.btn-handbook-outline:hover {
+    background: #FFD700;
+    color: #800000;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(255, 215, 0, 0.4);
+}
+
 /* Maroon overlay */
 body::before {
     content: '';
