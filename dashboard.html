@@ -4,194 +4,637 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Admin Dashboard | PhilTechGMA</title>
-    <!-- Bootstrap 5 + Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <!-- Custom Dashboard CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles/dashboard.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f5f7fb;
+            overflow-x: hidden;
+        }
+
+        /* Modern Navbar */
+        .navbar {
+            background: #800000 !important;
+            padding: 2px;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .navbar-brand img {
+            height: 42px;
+            width: auto;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+
+        .brand-text {
+            color: #FFD700;
+            font-size: 1.3rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        .brand-text-light {
+            color: rgba(255, 215, 0, 0.85);
+            font-weight: 400;
+        }
+
+        /* Admin Profile Section */
+        .admin-profile {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .admin-email {
+            color: #FFD700;
+            font-size: 0.9rem;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.12);
+            padding: 6px 14px;
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .admin-email i {
+            font-size: 1rem;
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: 1.5px solid #FFD700;
+            color: #FFD700;
+            padding: 6px 18px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .logout-btn:hover {
+            background: #FFD700;
+            color: #800000;
+            transform: translateY(-2px);
+        }
+
+        /* Main Container - Maximized Space */
+        .main-container {
+            margin-top: 80px;
+            padding: 24px 32px;
+            max-width: 1600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Welcome Section */
+        .welcome-section {
+            margin-bottom: 32px;
+        }
+
+        .welcome-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 6px;
+        }
+
+        .welcome-title span {
+            background: linear-gradient(135deg, #800000, #b8860b);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .date-badge {
+            color: #64748b;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Summary Cards - Maximized */
+        .summary-card {
+            border: none;
+            border-radius: 24px;
+            background: white;
+            padding: 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .summary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 35px -12px rgba(128, 0, 0, 0.15);
+        }
+
+        .card-body-custom {
+            padding: 24px 20px;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #800000;
+            margin-bottom: 4px;
+            line-height: 1.2;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #64748b;
+            margin-bottom: 8px;
+        }
+
+        .stat-icon {
+            font-size: 2.2rem;
+            opacity: 0.7;
+        }
+
+        /* Chart Cards */
+        .chart-card, .action-card, .search-card {
+            border: none;
+            border-radius: 24px;
+            background: white;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            height: 100%;
+        }
+
+        .card-header-custom {
+            background: #800000;
+            color: #FFD700;
+            padding: 16px 24px;
+            font-weight: 600;
+            font-size: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header-custom i {
+            margin-right: 8px;
+        }
+
+        .card-badge {
+            background: rgba(255, 215, 0, 0.2);
+            color: #FFD700;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        .card-body-padded {
+            padding: 24px;
+        }
+
+        /* Buttons */
+        .btn-maroon {
+            background: #800000;
+            color: #FFD700;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-maroon:hover {
+            background: #9a1a1a;
+            color: #FFE55C;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline-maroon {
+            background: transparent;
+            border: 1.5px solid #800000;
+            color: #800000;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-maroon:hover {
+            background: #800000;
+            color: #FFD700;
+            transform: translateY(-2px);
+        }
+
+        /* Search */
+        .search-input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-input-group input {
+            flex: 1;
+            padding: 10px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .search-input-group input:focus {
+            outline: none;
+            border-color: #FFD700;
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
+        }
+
+        /* Modals */
+        .modal-content-custom {
+            border-radius: 28px;
+            border: none;
+            overflow: hidden;
+        }
+
+        .modal-header-custom {
+            background: #800000;
+            color: #FFD700;
+            padding: 18px 24px;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .modal-header-custom .modal-title {
+            margin: 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            line-height: 1.2;
+        }
+
+        .modal-header-custom .btn-close {
+            margin: 0;
+            padding: 0;
+            width: 1.15rem;
+            height: 1.15rem;
+            flex: 0 0 auto;
+        }
+
+        .modal-body-custom {
+            padding: 28px;
+        }
+
+        .form-control-modern, .form-select-modern {
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 10px 16px;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .form-control-modern:focus, .form-select-modern:focus {
+            border-color: #FFD700;
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
+            outline: none;
+        }
+
+        /* Grid Gaps Maximized */
+        .row-gap-24 {
+            row-gap: 24px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0.8rem 1rem;
+            }
+            .brand-text {
+                font-size: 1rem;
+            }
+            .admin-email {
+                display: none;
+            }
+            .main-container {
+                padding: 16px;
+                margin-top: 70px;
+            }
+            .welcome-title {
+                font-size: 1.3rem;
+            }
+            .stat-number {
+                font-size: 1.8rem;
+            }
+            .card-body-custom {
+                padding: 16px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .brand-text {
+                font-size: 0.85rem;
+            }
+            .navbar-brand img {
+                height: 32px;
+            }
+            .logout-btn {
+                padding: 4px 12px;
+                font-size: 0.75rem;
+            }
+        }
+
+        /* Animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-up {
+            animation: fadeInUp 0.5s ease forwards;
+        }
+    </style>
 </head>
 <body>
-    <!-- Top Navigation (compact) -->
-    <nav class="navbar navbar-expand navbar-dark py-2">
-        <div class="container-fluid px-3">
+    <!-- Navbar - Simplified with Logo and Text only -->
+    <nav class="navbar">
+        <div class="container-fluid px-0">
             <a class="navbar-brand" href="#">
-                <img src="logo.png" alt="Logo" height="32" class="me-2">
-                <span class="fw-bold">PhilTechGMA · Admin</span>
+                <img src="styles/image/logo.png" alt="PhilTechGMA Logo">
+                <span class="brand-text">PhilTechGMA <span class="brand-text-light">· Admin Portal</span></span>
             </a>
-            <div class="ms-auto">
-                <span class="text-gold me-2 small"><i class="bi bi-person-circle"></i> Admin</span>
-                <a href="login.html" class="btn btn-outline-gold btn-sm py-0">Logout</a>
+            <div class="admin-profile">
+                <div class="admin-email">
+                    <i class="bi bi-person-circle"></i>
+                    <span id="adminEmail">admin@philtechgma.edu.ph</span>
+                </div>
+                <button id="logoutBtn" class="logout-btn">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </button>
             </div>
         </div>
     </nav>
 
-    <div class="container-fluid px-3 py-2">
-        <!-- Summary Cards Row (compact) -->
-        <div class="row g-2 mb-3">
-            <div class="col-6 col-md-3">
-                <div class="card summary-card">
-                    <div class="card-body py-2 px-3">
-                        <div class="d-flex justify-content-between align-items-center">
+    <!-- Main Container - Maximized Spaces -->
+    <div class="main-container">
+        <!-- Welcome Section -->
+        <div class="welcome-section fade-up">
+            <h1 class="welcome-title">Welcome back, <span>Administrator</span></h1>
+            <div class="date-badge">
+                <i class="bi bi-calendar3"></i>
+                <span id="currentDate"></span>
+                <i class="bi bi-dot"></i>
+                <i class="bi bi-graph-up"></i>
+                <span>Real-time Dashboard</span>
+            </div>
+        </div>
+
+        <!-- Summary Cards Row -->
+        <div class="row g-4 mb-4">
+            <div class="col-12 col-sm-6 col-xl-3">
+                <div class="summary-card fade-up" style="animation-delay: 0.05s;">
+                    <div class="card-body-custom">
+                        <div class="d-flex justify-content-between align-items-start">
                             <div>
-                                <h6 class="text-muted mb-0 small">Total Students</h6>
-                                <h3 class="mb-0" id="totalStudents">0</h3>
+                                <div class="stat-label">Total Students</div>
+                                <div class="stat-number" id="totalStudents">0</div>
+                                <small class="text-muted"><i class="bi bi-database"></i> Enrolled this semester</small>
                             </div>
-                            <i class="bi bi-people-fill summary-icon"></i>
+                            <i class="bi bi-people-fill stat-icon" style="color: #800000;"></i>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-6 col-md-3">
-                <div class="card summary-card">
-                    <div class="card-body py-2 px-3">
-                        <div class="d-flex justify-content-between align-items-center">
+            <div class="col-12 col-sm-6 col-xl-3">
+                <div class="summary-card fade-up" style="animation-delay: 0.1s;">
+                    <div class="card-body-custom">
+                        <div class="d-flex justify-content-between align-items-start">
                             <div>
-                                <h6 class="text-muted mb-0 small">Total Violations</h6>
-                                <h3 class="mb-0" id="totalViolations">0</h3>
+                                <div class="stat-label">Total Violations</div>
+                                <div class="stat-number" id="totalViolations">0</div>
+                                <small class="text-muted"><i class="bi bi-clock-history"></i> Recorded incidents</small>
                             </div>
-                            <i class="bi bi-exclamation-triangle-fill summary-icon"></i>
+                            <i class="bi bi-exclamation-triangle-fill stat-icon" style="color: #d97706;"></i>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-6 col-md-3">
-                <div class="card summary-card">
-                    <div class="card-body py-2 px-3">
-                        <div class="d-flex justify-content-between align-items-center">
+            <div class="col-12 col-sm-6 col-xl-3">
+                <div class="summary-card fade-up" style="animation-delay: 0.15s;">
+                    <div class="card-body-custom">
+                        <div class="d-flex justify-content-between align-items-start">
                             <div>
-                                <h6 class="text-muted mb-0 small">With Violations</h6>
-                                <h3 class="mb-0" id="studentsWithViolations">0</h3>
+                                <div class="stat-label">With Violations</div>
+                                <div class="stat-number" id="studentsWithViolations">0</div>
+                                <small class="text-muted"><i class="bi bi-people"></i> Have records</small>
                             </div>
-                            <i class="bi bi-person-warning summary-icon"></i>
+                            <i class="bi bi-person-warning stat-icon" style="color: #ea580c;"></i>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-6 col-md-3">
-                <div class="card summary-card">
-                    <div class="card-body py-2 px-3">
-                        <div class="d-flex justify-content-between align-items-center">
+            <div class="col-12 col-sm-6 col-xl-3">
+                <div class="summary-card fade-up" style="animation-delay: 0.2s;">
+                    <div class="card-body-custom">
+                        <div class="d-flex justify-content-between align-items-start">
                             <div>
-                                <h6 class="text-muted mb-0 small">Suspension Eligible</h6>
-                                <h3 class="mb-0" id="eligibleCount">0</h3>
+                                <div class="stat-label">Suspension Eligible</div>
+                                <div class="stat-number" id="eligibleCount">0</div>
+                                <small class="text-muted"><i class="bi bi-flag"></i> Requires action</small>
                             </div>
-                            <i class="bi bi-hourglass-split summary-icon"></i>
+                            <i class="bi bi-hourglass-split stat-icon" style="color: #dc2626;"></i>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Charts Row (small graphs) -->
-        <div class="row g-2 mb-3">
-            <div class="col-md-6">
-                <div class="card chart-card">
-                    <div class="card-header bg-maroon text-gold py-2">
-                        <i class="bi bi-bar-chart-steps"></i> Violations Trend (Last 6 Months)
+        <!-- Charts Row -->
+        <div class="row g-4 mb-4">
+            <div class="col-12 col-lg-7">
+                <div class="chart-card fade-up" style="animation-delay: 0.25s;">
+                    <div class="card-header-custom">
+                        <span><i class="bi bi-bar-chart-steps"></i> Violations Trend (Last 6 Months)</span>
+                        <span class="card-badge"><i class="bi bi-graph-up"></i> Analytics</span>
                     </div>
-                    <div class="card-body py-2">
-                        <canvas id="trendChart" height="150"></canvas>
+                    <div class="card-body-padded">
+                        <canvas id="trendChart" height="200"></canvas>
                     </div>
                 </div>
             </div>
-            <div class="col-md-6">
-                <div class="card chart-card">
-                    <div class="card-header bg-maroon text-gold py-2">
-                        <i class="bi bi-pie-chart"></i> Violation Distribution
+            <div class="col-12 col-lg-5">
+                <div class="chart-card fade-up" style="animation-delay: 0.3s;">
+                    <div class="card-header-custom">
+                        <span><i class="bi bi-pie-chart"></i> Violation Distribution</span>
+                        <span class="card-badge"><i class="bi bi-percent"></i> Breakdown</span>
                     </div>
-                    <div class="card-body py-2">
-                        <canvas id="typeChart" height="150"></canvas>
+                    <div class="card-body-padded">
+                        <canvas id="typeChart" height="200"></canvas>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Action Buttons & Search (inline) -->
-        <div class="row g-2">
-            <div class="col-md-8">
-                <div class="card action-card">
-                    <div class="card-header bg-maroon text-gold py-2">
-                        <i class="bi bi-grid-3x3-gap-fill"></i> Quick Actions
+        <!-- Actions & Search Row -->
+        <div class="row g-4">
+            <div class="col-12 col-lg-7">
+                <div class="action-card fade-up" style="animation-delay: 0.35s;">
+                    <div class="card-header-custom">
+                        <span><i class="bi bi-grid-3x3-gap-fill"></i> Quick Actions</span>
+                        <span class="card-badge"><i class="bi bi-lightning-charge"></i> 4 available</span>
                     </div>
-                    <div class="card-body py-2">
-                        <div class="d-flex flex-wrap gap-1">
-                            <button class="btn btn-maroon btn-sm" data-bs-toggle="modal" data-bs-target="#recordModal"><i class="bi bi-journal-plus"></i> Record</button>
-                            <button class="btn btn-maroon btn-sm" data-bs-toggle="modal" data-bs-target="#historyModal"><i class="bi bi-clock-history"></i> History</button>
-                            <button class="btn btn-maroon btn-sm" data-bs-toggle="modal" data-bs-target="#eligibilityModal"><i class="bi bi-check2-circle"></i> Eligibility</button>
-                            <button class="btn btn-maroon btn-sm" data-bs-toggle="modal" data-bs-target="#reportModal"><i class="bi bi-file-earmark-spreadsheet"></i> Report</button>
+                    <div class="card-body-padded">
+                        <div class="d-flex flex-wrap gap-2">
+                            <button class="btn-maroon" data-bs-toggle="modal" data-bs-target="#recordModal">
+                                <i class="bi bi-journal-plus"></i> Record Violation
+                            </button>
+                            <button class="btn-outline-maroon" data-bs-toggle="modal" data-bs-target="#historyModal">
+                                <i class="bi bi-clock-history"></i> View History
+                            </button>
+                            <button class="btn-outline-maroon" data-bs-toggle="modal" data-bs-target="#eligibilityModal">
+                                <i class="bi bi-check2-circle"></i> Eligibility
+                            </button>
+                            <button class="btn-outline-maroon" data-bs-toggle="modal" data-bs-target="#reportModal">
+                                <i class="bi bi-file-earmark-spreadsheet"></i> Report
+                            </button>
+                            <button class="btn-outline-maroon" data-bs-toggle="modal" data-bs-target="#usersModal">
+                                <i class="bi bi-person-lines-fill"></i> See Username &amp; Email
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="card search-card">
-                    <div class="card-header bg-maroon text-gold py-2">
-                        <i class="bi bi-search"></i> Search Student
+            <div class="col-12 col-lg-5">
+                <div class="search-card fade-up" style="animation-delay: 0.4s;">
+                    <div class="card-header-custom">
+                        <span><i class="bi bi-search"></i> Student Lookup</span>
+                        <span class="card-badge"><i class="bi bi-person"></i> Quick search</span>
                     </div>
-                    <div class="card-body py-2">
-                        <div class="input-group input-group-sm">
-                            <input type="text" class="form-control form-control-sm" id="searchInput" placeholder="ID or Name">
-                            <button class="btn btn-maroon btn-sm" id="searchBtn">Go</button>
+                    <div class="card-body-padded">
+                        <div class="search-input-group">
+                            <input type="text" id="searchInput" placeholder="Enter Student ID or Name...">
+                            <button class="btn-maroon" id="searchBtn">
+                                <i class="bi bi-search"></i> Search
+                            </button>
                         </div>
-                        <div id="searchResult" class="mt-1 small"></div>
+                        <div id="searchResult" class="mt-3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Student Accounts List -->
+        <div class="row g-4 mt-1">
+            <div class="col-12">
+                <div class="chart-card fade-up" style="animation-delay: 0.45s;">
+                    <div class="card-header-custom">
+                        <span><i class="bi bi-people"></i> Student Accounts (Supabase)</span>
+                        <span class="card-badge"><i class="bi bi-database"></i> Live list</span>
+                    </div>
+                    <div class="card-body-padded">
+                        <div class="table-responsive">
+                            <table class="table table-sm align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Student Name</th>
+                                        <th>Student ID</th>
+                                        <th>Course</th>
+                                        <th>Year</th>
+                                        <th>Violation Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="studentAccountsTableBody">
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">Loading students...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ========== MODALS (unchanged, keep functional) ========== -->
-    <!-- Record Violation Modal -->
+    <!-- MODALS -->
     <div class="modal fade" id="recordModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-maroon text-gold">
-                    <h5 class="modal-title"><i class="bi bi-journal-plus"></i> Record Violation</h5>
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modal-content-custom">
+                <div class="modal-header-custom">
+                    <h5 class="modal-title"><i class="bi bi-journal-plus"></i> Record New Violation</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body-custom">
                     <form id="violationForm">
                         <div class="mb-3">
-                            <label class="form-label">Student</label>
-                            <select class="form-select" id="violationStudentId" required>
+                            <label class="form-label fw-semibold">Student</label>
+                            <select class="form-select-modern w-100" id="violationStudentId" required>
                                 <option value="">Select student</option>
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Violation Type</label>
-                            <select class="form-select" id="violationType" required>
-                                <option value="Minor Offense">Minor Offense</option>
-                                <option value="Major Offense">Major Offense</option>
-                                <option value="Grave Offense">Grave Offense</option>
+                            <label class="form-label fw-semibold">Violation Type</label>
+                            <select class="form-select-modern w-100" id="violationType" required>
+                                <option value="Minor Offense">Minor Offense (1 point)</option>
+                                <option value="Major Offense">Major Offense (3 points)</option>
+                                <option value="Grave Offense">Grave Offense (6 points)</option>
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Date</label>
-                            <input type="date" class="form-control" id="violationDate" required>
+                            <label class="form-label fw-semibold">Date of Incident</label>
+                            <input type="date" class="form-control-modern w-100" id="violationDate" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Description</label>
-                            <textarea class="form-control" id="violationDesc" rows="2" required></textarea>
+                            <label class="form-label fw-semibold">Description</label>
+                            <textarea class="form-control-modern w-100" id="violationDesc" rows="3" placeholder="Describe the violation..." required></textarea>
                         </div>
-                        <button type="submit" class="btn btn-maroon w-100">Record Violation</button>
+                        <button type="submit" class="btn-maroon w-100 py-2">
+                            <i class="bi bi-save"></i> Record Violation
+                        </button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Violation History Modal -->
     <div class="modal fade" id="historyModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header bg-maroon text-gold">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content modal-content-custom">
+                <div class="modal-header-custom">
                     <h5 class="modal-title"><i class="bi bi-clock-history"></i> Violation History</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body">
-                    <select class="form-select mb-3" id="historyStudentId">
+                <div class="modal-body-custom">
+                    <select class="form-select-modern w-100 mb-3" id="historyStudentId">
                         <option value="">Select student</option>
                     </select>
                     <div id="historyList"></div>
@@ -200,45 +643,125 @@
         </div>
     </div>
 
-    <!-- Suspension Eligibility Modal -->
     <div class="modal fade" id="eligibilityModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-maroon text-gold">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modal-content-custom">
+                <div class="modal-header-custom">
                     <h5 class="modal-title"><i class="bi bi-check2-circle"></i> Suspension Eligibility</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body">
-                    <select class="form-select mb-3" id="eligibilityStudentId">
+                <div class="modal-body-custom">
+                    <select class="form-select-modern w-100 mb-3" id="eligibilityStudentId">
                         <option value="">Select student</option>
                     </select>
-                    <div id="eligibilityResult" class="alert alert-info"></div>
+                    <div id="eligibilityResult" class="alert"></div>
+                    <div class="mt-3 p-3 bg-light rounded-3">
+                        <small class="text-muted">
+                            <i class="bi bi-info-circle"></i> 
+                            <strong>Rule:</strong> 5+ points = Eligible for suspension
+                            <br>Minor=1 | Major=3 | Grave=6
+                        </small>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Generate Report Modal -->
     <div class="modal fade" id="reportModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-maroon text-gold">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modal-content-custom">
+                <div class="modal-header-custom">
                     <h5 class="modal-title"><i class="bi bi-file-earmark-spreadsheet"></i> Generate Report</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body-custom">
                     <div class="mb-3">
-                        <label class="form-label">Report Type</label>
-                        <select class="form-select" id="reportType">
-                            <option value="summary">Violation Summary (All Students)</option>
-                            <option value="byStudent">Violations by Student</option>
+                        <label class="form-label fw-semibold">Report Type</label>
+                        <select class="form-select-modern w-100" id="reportType">
+                            <option value="summary">📊 Summary Report (All Students)</option>
+                            <option value="byStudent">👤 Individual Student Report</option>
                         </select>
                     </div>
                     <div id="reportStudentDiv" class="mb-3 d-none">
-                        <label class="form-label">Select Student</label>
-                        <select class="form-select" id="reportStudentId"></select>
+                        <label class="form-label fw-semibold">Select Student</label>
+                        <select class="form-select-modern w-100" id="reportStudentId"></select>
                     </div>
-                    <button id="generateReportBtn" class="btn btn-maroon w-100">Download CSV</button>
+                    <button id="generateReportBtn" class="btn-maroon w-100 py-2">
+                        <i class="bi bi-download"></i> Download CSV Report
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="usersModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content modal-content-custom">
+                <div class="modal-header-custom">
+                    <h5 class="modal-title"><i class="bi bi-person-lines-fill"></i> Username &amp; Email List</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body-custom">
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Username</th>
+                                    <th>Email</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody">
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted">Loading users...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <small class="text-muted d-block mt-2">Note: Email appears if the `students` table stores an `email` field.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="composeEmailModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modal-content-custom">
+                <div class="modal-header-custom">
+                    <h5 class="modal-title"><i class="bi bi-envelope-paper"></i> Compose Student Email</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body-custom">
+                    <div class="mb-2">
+                        <label class="form-label fw-semibold">Recipient</label>
+                        <input type="text" id="composeRecipient" class="form-control-modern w-100" readonly>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold d-block">Message Type</label>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="messageType" id="messageTypeTemplate" value="template" checked>
+                            <label class="form-check-label" for="messageTypeTemplate">Use Template</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="messageType" id="messageTypeCustom" value="custom">
+                            <label class="form-check-label" for="messageTypeCustom">Custom Email</label>
+                        </div>
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="form-label fw-semibold">Subject</label>
+                        <input type="text" id="composeSubject" class="form-control-modern w-100">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Message</label>
+                        <textarea id="composeBody" class="form-control-modern w-100" rows="6"></textarea>
+                    </div>
+
+                    <button type="button" id="sendEmailNowBtn" class="btn-maroon w-100">
+                        <i class="bi bi-send"></i> Send Email Now
+                    </button>
                 </div>
             </div>
         </div>
@@ -246,5 +769,10 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="scripts/dashboard.js"></script>
+    <script>
+        // Display current date
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('currentDate').innerText = new Date().toLocaleDateString('en-US', options);
+    </script>
 </body>
 </html>

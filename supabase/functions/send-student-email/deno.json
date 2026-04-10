@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "lib": ["deno.unstable", "deno.dom"],
+    "strict": true,
+    "noImplicitAny": false
+  },
+  "imports": {
+    "$supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2?deno-std=0.224.0",
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2?deno-std=0.224.0"
+  },
+  "tasks": {
+    "start": "deno run --allow-net --allow-env index.ts"
+  }
+}

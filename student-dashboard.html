@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard | PhilTechGMA</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body {
+            background: #faf7f2;
+            font-family: Inter, "Segoe UI", sans-serif;
+        }
+        .topbar {
+            background: #800000;
+            color: #FFD700;
+        }
+        .brand-title {
+            font-weight: 700;
+            letter-spacing: 0.2px;
+        }
+        .card {
+            border: 1px solid rgba(128, 0, 0, 0.08);
+            border-radius: 14px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+        }
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #800000;
+        }
+        .badge-maroon {
+            background: rgba(128, 0, 0, 0.12);
+            color: #800000;
+            border: 1px solid rgba(128, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar topbar">
+        <div class="container-fluid px-3">
+            <span class="navbar-brand mb-0 h1 text-warning-emphasis brand-title">
+                <img src="styles/image/logo.png" alt="Logo" height="28" class="me-2">
+                PhilTechGMA · Student Dashboard
+            </span>
+            <button id="logoutBtn" class="btn btn-sm btn-outline-warning">Logout</button>
+        </div>
+    </nav>
+
+    <main class="container py-4">
+        <div class="row g-3 mb-3">
+            <div class="col-12 col-lg-8">
+                <div class="card p-3">
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                        <div>
+                            <h5 class="mb-1">Welcome, <span id="studentName">Student</span></h5>
+                            <small class="text-muted">Email: <span id="studentEmail">-</span></small>
+                        </div>
+                        <span class="badge rounded-pill badge-maroon">Authenticated Session</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-2">
+                <div class="card p-3 text-center">
+                    <small class="text-muted">Violations</small>
+                    <div class="metric-value" id="totalViolations">0</div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-2">
+                <div class="card p-3 text-center">
+                    <small class="text-muted">Points</small>
+                    <div class="metric-value" id="totalPoints">0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-12">
+                <div class="card p-3">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <h6 class="mb-0"><i class="bi bi-clock-history me-1"></i>My Violation History</h6>
+                        <span id="eligibilityBadge" class="badge rounded-pill text-bg-success">Not Eligible for Suspension</span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody id="violationsTableBody">
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted">Loading...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="scripts/student-dashboard.js"></script>
+</body>
+</html>
