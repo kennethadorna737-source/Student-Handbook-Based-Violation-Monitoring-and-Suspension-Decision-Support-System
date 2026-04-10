@@ -485,27 +485,43 @@ document.getElementById('sendEmailNowBtn')?.addEventListener('click', async () =
   }
 
   try {
-    const { data: sessionData, error: sessionError } = await supabaseClient.auth.getSession();
-    if (sessionError || !sessionData?.session?.access_token) {
+    const sendRequest = async (accessToken) => {
+      const response = await fetch(`${SUPABASE_URL}/functions/v1/send-student-email`, {
+        mode: 'cors',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${accessToken}`
+        },
+        body: JSON.stringify({ to: selectedEmail, subject, body })
+      });
+
+      let payload = {};
+      try {
+        payload = await response.json();
+      } catch (_) {
+        payload = {};
+      }
+      return { response, payload };
+    };
+
+    let { data: sessionData, error: sessionError } = await supabaseClient.auth.getSession();
+    let accessToken = sessionData?.session?.access_token;
+    if (sessionError || !accessToken) {
       throw new Error('No active session token. Please log in again.');
     }
 
-    const response = await fetch(`${SUPABASE_URL}/functions/v1/send-student-email`, {
-      mode: 'cors',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        apikey: SUPABASE_ANON_KEY,
-        Authorization: `Bearer ${sessionData.session.access_token}`
-      },
-      body: JSON.stringify({ to: selectedEmail, subject, body })
-    });
+    let { response, payload } = await sendRequest(accessToken);
 
-    let payload = {};
-    try {
-      payload = await response.json();
-    } catch (_) {
-      payload = {};
+    // If token is stale, refresh once and retry.
+    if (response.status === 401) {
+      const { data: refreshData, error: refreshError } = await supabaseClient.auth.refreshSession();
+      if (refreshError || !refreshData?.session?.access_token) {
+        throw new Error('Session expired. Please log in again.');
+      }
+      accessToken = refreshData.session.access_token;
+      ({ response, payload } = await sendRequest(accessToken));
     }
 
     if (!response.ok) {
