@@ -507,10 +507,12 @@ document.getElementById('sendEmailNowBtn')?.addEventListener('click', async () =
     };
 
     let { data: sessionData, error: sessionError } = await supabaseClient.auth.getSession();
-    let accessToken = sessionData?.session?.access_token;
-    if (sessionError || !accessToken) {
-      throw new Error('No active session token. Please log in again.');
-    }
+let accessToken = sessionData?.session?.access_token;
+
+
+console.log('Session error:', sessionError);
+console.log('Access token exists:', !!accessToken);
+console.log('Token preview:', accessToken?.substring(0, 20));
 
     let { response, payload } = await sendRequest(accessToken);
 
