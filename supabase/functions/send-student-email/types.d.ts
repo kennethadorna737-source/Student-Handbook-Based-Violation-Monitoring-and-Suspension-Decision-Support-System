@@ -3,19 +3,32 @@ declare const Deno: {
   env: {
     get: (key: string) => string | undefined;
   };
+  connectTls: (options: { hostname: string; port: number }) => Promise<{
+    read(p: Uint8Array): Promise<number | null>;
+    write(p: Uint8Array): Promise<number>;
+    close(): void;
+  }>;
+  hostname: () => string;
 };
 
-declare module "https://esm.sh/@supabase/supabase-js@2" {
-  export function createClient(url: string, key: string, options?: unknown): any;
+// Global btoa polyfill declaration for base64 (Deno Deploy has atob/btoa)
+declare function btoa(data: string): string;
+
+declare module "$supabase/supabase-js" {
+  export function createClient(url: string, key: string, options?: any): any;
 }
 
-// SMTP types
-declare module "https://deno.land/x/smtp@v0.5.1/mod.ts" {
+declare module "@supabase/supabase-js" {
+  export function createClient(url: string, key: string, options?: any): any;
+}
+
+// SMTP types (unused but kept)
+declare module "https://deno.land/x/deno_smtp@0.8.1/mod.ts" {
   export class SMTPClient {
     constructor();
-    connect(host: string, port: number): Promise<void>;
-    login(user: string, pass: string): Promise<void>;
-    sendMessage(options: {from: string, to: string[], subject: string, text: string}): Promise<void>;
-    quit(): Promise<void>;
+    connectTLS(options: { hostname: string, port: number, username: string, password: string }): Promise<void>;
+    send(options: { from: string, to: string, subject: string, content: string }): Promise<void>;
+    close(): Promise<void>;
   }
 }
+

@@ -1,6 +1,5 @@
 // @ts-nocheck
 import { createClient } from '$supabase/supabase-js';
-import { SMTPClient } from '$smtp';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -16,16 +15,20 @@ Deno.serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
     const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY');
-    const gmailUser = Deno.env.get('GMAIL_USER');
-    const gmailPass = Deno.env.get('GMAIL_APP_PASSWORD');
+    const brevoApiKey = Deno.env.get('BREVO_API_KEY');
+    const senderEmail = Deno.env.get('BREVO_SENDER_EMAIL'); // your verified sender email in Brevo
+    const senderName = Deno.env.get('BREVO_SENDER_NAME') ?? 'PhilTechGMA Admin';
 
-    if (!supabaseUrl || !supabaseAnonKey || !gmailUser || !gmailPass) {
+    if (!supabaseUrl || !supabaseAnonKey || !brevoApiKey || !senderEmail) {
       return new Response(
-        JSON.stringify({ error: 'Server configuration error: missing env vars (SUPABASE_URL, SUPABASE_ANON_KEY, GMAIL_USER, GMAIL_APP_PASSWORD)' }),
+        JSON.stringify({
+          error: 'Server configuration error: missing env vars (SUPABASE_URL, SUPABASE_ANON_KEY, BREVO_API_KEY, BREVO_SENDER_EMAIL)',
+        }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
+    // Authenticate the caller
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
       return new Response(JSON.stringify({ error: 'Missing authorization header' }), {
@@ -68,6 +71,7 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Parse request body
     const { to, subject, body } = await req.json();
     if (!to || !subject || !body) {
       return new Response(JSON.stringify({ error: 'Missing required fields: to, subject, body' }), {
@@ -76,19 +80,42 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Send email via Gmail SMTP
-    const client = new SMTPClient();
-    await client.connect('smtp.gmail.com', 587);
-    await client.login(gmailUser, gmailPass);
-    await client.sendMessage({
-      from: gmailUser,
-      to: [to],
-      subject: subject,
-      text: body,
+    // Send email via Brevo (Sendinblue) API
+    const brevoResponse = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'api-key': brevoApiKey,
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        sender: {
+          name: senderName,
+          email: senderEmail,
+        },
+        to: [
+          { email: to },
+        ],
+        subject: subject,
+        textContent: body,
+        // Optional: also send as HTML (converts newlines to <br>)
+        htmlContent: `<pre style="font-family:Arial,sans-serif;font-size:14px;white-space:pre-wrap;">${body}</pre>`,
+      }),
     });
-    await client.quit();
 
-    return new Response(JSON.stringify({ success: true }), {
+    const brevoResult = await brevoResponse.json();
+
+    if (!brevoResponse.ok) {
+      console.error('Brevo API error:', brevoResult);
+      return new Response(
+        JSON.stringify({ error: 'Failed to send email via Brevo', details: brevoResult }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    console.log('Email sent successfully via Brevo:', brevoResult);
+
+    return new Response(JSON.stringify({ success: true, messageId: brevoResult.messageId }), {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
@@ -101,4 +128,3 @@ Deno.serve(async (req) => {
     );
   }
 });
-

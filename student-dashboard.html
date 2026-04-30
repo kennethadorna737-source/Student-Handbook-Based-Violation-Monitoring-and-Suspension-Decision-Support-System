@@ -6,103 +6,501 @@
     <title>Student Dashboard | PhilTechGMA</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            background: #faf7f2;
-            font-family: Inter, "Segoe UI", sans-serif;
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            background: #f5f7fb;
+            min-height: 100vh;
         }
+
+        /* Navbar */
         .topbar {
             background: #800000;
+            padding: 0 1.5rem;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+        }
+
+        .topbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .topbar-brand img {
+            height: 36px;
+        }
+
+        .topbar-brand span {
             color: #FFD700;
-        }
-        .brand-title {
             font-weight: 700;
-            letter-spacing: 0.2px;
+            font-size: 1rem;
+            letter-spacing: -0.2px;
         }
-        .card {
-            border: 1px solid rgba(128, 0, 0, 0.08);
-            border-radius: 14px;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+
+        .topbar-brand small {
+            color: rgba(255,215,0,0.7);
+            font-weight: 400;
         }
-        .metric-value {
-            font-size: 1.8rem;
-            font-weight: 700;
+
+        .logout-btn {
+            background: transparent;
+            border: 1.5px solid #FFD700;
+            color: #FFD700;
+            padding: 5px 16px;
+            border-radius: 40px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: #FFD700;
             color: #800000;
         }
-        .badge-maroon {
-            background: rgba(128, 0, 0, 0.12);
+
+        /* Main */
+        .main-content {
+            margin-top: 60px;
+            padding: 28px 32px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Welcome */
+        .welcome-section {
+            margin-bottom: 28px;
+        }
+
+        .welcome-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .welcome-title span {
+            background: linear-gradient(135deg, #800000, #b8860b);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .welcome-meta {
+            color: #64748b;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        /* Cards */
+        .stat-card {
+            background: white;
+            border-radius: 20px;
+            padding: 22px 20px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            transition: all 0.3s;
+            height: 100%;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 28px rgba(128,0,0,0.1);
+        }
+
+        .stat-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: #64748b;
+            margin-bottom: 6px;
+        }
+
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 800;
             color: #800000;
-            border: 1px solid rgba(128, 0, 0, 0.2);
+            line-height: 1.1;
+            margin-bottom: 4px;
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            opacity: 0.65;
+        }
+
+        /* Profile card */
+        .profile-card {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        }
+
+        .profile-avatar {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #800000, #b8860b);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #FFD700;
+            font-size: 1.5rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .profile-info h5 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 2px;
+        }
+
+        .profile-info small {
+            color: #64748b;
+            font-size: 0.82rem;
+        }
+
+        .profile-meta {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .profile-meta-item {
+            background: #f1f5f9;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            color: #475569;
+            font-weight: 500;
+        }
+
+        /* Suspension progress */
+        .progress-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px 24px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        }
+
+        .progress-card h6 {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #64748b;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar-track {
+            background: #f1f5f9;
+            border-radius: 999px;
+            height: 10px;
+            overflow: hidden;
+            margin-bottom: 6px;
+        }
+
+        #suspensionProgress {
+            height: 100%;
+            border-radius: 999px;
+            transition: width 0.6s ease, background 0.3s ease;
+        }
+
+        #progressLabel {
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+
+        /* Violations table card */
+        .table-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        }
+
+        .table-card-header {
+            background: #800000;
+            color: #FFD700;
+            padding: 16px 24px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .table-card-header .badge {
+            background: rgba(255,215,0,0.2);
+            color: #FFD700;
+            font-size: 0.7rem;
+            font-weight: 500;
+            padding: 4px 12px;
+            border-radius: 30px;
+        }
+
+        .table-card-body {
+            padding: 0;
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table thead th {
+            background: rgba(128,0,0,0.05);
+            color: #800000;
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(128,0,0,0.1);
+        }
+
+        .table td {
+            padding: 14px 16px;
+            font-size: 0.88rem;
+            color: #374151;
+            vertical-align: middle;
+            border-color: #f1f5f9;
+        }
+
+        .table tbody tr:hover {
+            background: #fafbfc;
+        }
+
+        /* Eligibility badge */
+        #eligibilityBadge {
+            font-size: 0.8rem;
+            padding: 6px 14px;
+            border-radius: 30px;
+        }
+
+        /* Handbook link */
+        .handbook-link {
+            background: white;
+            border-radius: 20px;
+            padding: 20px 24px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            text-align: center;
+        }
+
+        .handbook-link a {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #800000;
+            color: #FFD700;
+            padding: 10px 24px;
+            border-radius: 40px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.88rem;
+            transition: all 0.2s;
+        }
+
+        .handbook-link a:hover {
+            background: #9a1a1a;
+            transform: translateY(-2px);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-up { animation: fadeInUp 0.45s ease forwards; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-content { padding: 16px; }
+            .topbar { padding: 0 1rem; }
+            .topbar-brand span { font-size: 0.88rem; }
+            .stat-value { font-size: 1.8rem; }
+            .welcome-title { font-size: 1.25rem; }
+        }
+
+        @media (max-width: 576px) {
+            .topbar-brand small { display: none; }
         }
     </style>
 </head>
 <body>
-    <nav class="navbar topbar">
-        <div class="container-fluid px-3">
-            <span class="navbar-brand mb-0 h1 text-warning-emphasis brand-title">
-                <img src="styles/image/logo.png" alt="Logo" height="28" class="me-2">
-                PhilTechGMA · Student Dashboard
-            </span>
-            <button id="logoutBtn" class="btn btn-sm btn-outline-warning">Logout</button>
+    <!-- Topbar -->
+    <nav class="topbar">
+        <div class="topbar-brand">
+            <img src="styles/image/logo.png" alt="PhilTechGMA Logo">
+            <span>PhilTechGMA <small>· Student Dashboard</small></span>
         </div>
+        <button id="logoutBtn" class="logout-btn">
+            <i class="bi bi-box-arrow-right"></i> Logout
+        </button>
     </nav>
 
-    <main class="container py-4">
+    <!-- Main -->
+    <div class="main-content" style="margin-top: 88px;">
+
+        <!-- Welcome -->
+        <div class="welcome-section fade-up">
+            <h1 class="welcome-title">Hello, <span id="studentName">Student</span></h1>
+            <div class="welcome-meta">
+                <i class="bi bi-calendar3"></i>
+                <span id="currentDate"></span>
+                <span>·</span>
+                <i class="bi bi-mortarboard"></i>
+                <span>Student Portal</span>
+            </div>
+        </div>
+
+        <!-- Profile + Stats Row -->
         <div class="row g-3 mb-3">
-            <div class="col-12 col-lg-8">
-                <div class="card p-3">
-                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                        <div>
-                            <h5 class="mb-1">Welcome, <span id="studentName">Student</span></h5>
-                            <small class="text-muted">Email: <span id="studentEmail">-</span></small>
+            <!-- Profile -->
+            <div class="col-12 col-lg-5">
+                <div class="profile-card fade-up" style="animation-delay:0.05s;">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="profile-avatar" id="profileInitial">S</div>
+                        <div class="profile-info">
+                            <h5 id="profileName">Student</h5>
+                            <small><i class="bi bi-envelope me-1"></i><span id="studentEmail">—</span></small>
+                            <div class="profile-meta">
+                                <span class="profile-meta-item"><i class="bi bi-book me-1"></i><span id="studentCourse">—</span></span>
+                                <span class="profile-meta-item"><i class="bi bi-calendar-check me-1"></i><span id="studentYear">—</span></span>
+                            </div>
                         </div>
-                        <span class="badge rounded-pill badge-maroon">Authenticated Session</span>
                     </div>
                 </div>
             </div>
+
+            <!-- Stat: Total Violations -->
             <div class="col-6 col-lg-2">
-                <div class="card p-3 text-center">
-                    <small class="text-muted">Violations</small>
-                    <div class="metric-value" id="totalViolations">0</div>
+                <div class="stat-card fade-up" style="animation-delay:0.1s;">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="stat-label">Violations</div>
+                            <div class="stat-value" id="totalViolations">0</div>
+                        </div>
+                        <i class="bi bi-exclamation-triangle-fill stat-icon" style="color:#d97706;"></i>
+                    </div>
+                    <small class="text-muted">Total incidents</small>
                 </div>
             </div>
+
+            <!-- Stat: Total Points -->
             <div class="col-6 col-lg-2">
-                <div class="card p-3 text-center">
-                    <small class="text-muted">Points</small>
-                    <div class="metric-value" id="totalPoints">0</div>
+                <div class="stat-card fade-up" style="animation-delay:0.15s;">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="stat-label">Points</div>
+                            <div class="stat-value" id="totalPoints">0</div>
+                        </div>
+                        <i class="bi bi-lightning-fill stat-icon" style="color:#800000;"></i>
+                    </div>
+                    <small class="text-muted">Cumulative score</small>
+                </div>
+            </div>
+
+            <!-- Stat: Status -->
+            <div class="col-12 col-lg-3">
+                <div class="stat-card fade-up" style="animation-delay:0.2s;">
+                    <div class="stat-label">Suspension Status</div>
+                    <div class="mt-2">
+                        <span id="eligibilityBadge" class="badge rounded-pill text-bg-success">✓ Not Eligible for Suspension</span>
+                    </div>
+                    <small class="text-muted d-block mt-2">Threshold: 5 points</small>
                 </div>
             </div>
         </div>
 
-        <div class="row g-3">
+        <!-- Progress Bar Row -->
+        <div class="row g-3 mb-3">
             <div class="col-12">
-                <div class="card p-3">
-                    <div class="d-flex align-items-center justify-content-between mb-2">
-                        <h6 class="mb-0"><i class="bi bi-clock-history me-1"></i>My Violation History</h6>
-                        <span id="eligibilityBadge" class="badge rounded-pill text-bg-success">Not Eligible for Suspension</span>
+                <div class="progress-card fade-up" style="animation-delay:0.25s;">
+                    <h6><i class="bi bi-speedometer2 me-2"></i>Suspension Risk Meter</h6>
+                    <div class="progress-bar-track">
+                        <div id="suspensionProgress" style="width:0%; background:#22c55e;" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
                     </div>
-                    <div class="table-responsive">
-                        <table class="table table-sm align-middle mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Type</th>
-                                    <th>Description</th>
-                                </tr>
-                            </thead>
-                            <tbody id="violationsTableBody">
-                                <tr>
-                                    <td colspan="3" class="text-center text-muted">Loading...</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <span id="progressLabel">0 / 5 pts toward suspension threshold</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Violations Table -->
+        <div class="row g-3 mb-3">
+            <div class="col-12">
+                <div class="table-card fade-up" style="animation-delay:0.3s;">
+                    <div class="table-card-header">
+                        <span><i class="bi bi-clock-history me-2"></i>My Violation History</span>
+                        <span class="badge">Live Records</span>
+                    </div>
+                    <div class="table-card-body">
+                        <div class="table-responsive">
+                            <table class="table align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Type</th>
+                                        <th>Description</th>
+                                        <th class="text-center">Points</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="violationsTableBody">
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted py-4">Loading your records...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </main>
+
+        <!-- Handbook Link -->
+        <div class="row g-3 mb-3">
+            <div class="col-12">
+                <div class="handbook-link fade-up" style="animation-delay:0.35s;">
+                    <p class="text-muted mb-3" style="font-size:0.88rem;">Familiarize yourself with the school's code of conduct and violation guidelines.</p>
+                    <a href="studenthandbook.html" target="_blank">
+                        <i class="bi bi-book-open"></i> Read the Student Handbook
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="scripts/student-dashboard.js"></script>
+    <script>
+        // Mirror student name to profile avatar initial
+        const obs = new MutationObserver(() => {
+            const name = document.getElementById('studentName')?.textContent || 'S';
+            const profileName = document.getElementById('profileName');
+            const profileInitial = document.getElementById('profileInitial');
+            if (profileName) profileName.textContent = name;
+            if (profileInitial) profileInitial.textContent = name.charAt(0).toUpperCase();
+        });
+        const nameEl = document.getElementById('studentName');
+        if (nameEl) obs.observe(nameEl, { childList: true, characterData: true, subtree: true });
+    </script>
 </body>
 </html>

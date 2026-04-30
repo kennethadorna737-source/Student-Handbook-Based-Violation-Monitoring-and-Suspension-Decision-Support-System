@@ -1,5 +1,7 @@
 // Supabase configuration
-const SUPABASE_URL = 'https://psoxppumeihdanqrgyzh.supabase.co';
+const SUPABASE_URL = window.location.hostname === 'localhost'
+  ? (typeof Deno !== 'undefined' ? 'http://localhost:54321' : 'http://127.0.0.1:54321')
+  : 'https://psoxppumeihdanqrgyzh.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzb3hwcHVtZWloZGFucXJneXpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5NzY4MzMsImV4cCI6MjA4OTU1MjgzM30.mnHWnufKUbo3asRBmnwTnjLU4-SIVtF8QoIBSrJSWuA';
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const INACTIVITY_TIMEOUT_MS = 15 * 60 * 1000;
@@ -10,6 +12,29 @@ let realtimeChannel;
 let selectedEmail = '';
 let selectedUsername = '';
 
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function showSuccessNotification(message) {
+    const notifId = 'success-notification-' + Date.now();
+    const notifHTML = `
+        <div id="${notifId}" class="alert alert-success alert-dismissible fade show position-fixed" role="alert" style="top: 20px; right: 20px; z-index: 9999; min-width: 300px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+            <strong>✓ Success!</strong> ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', notifHTML);
+    
+    // Auto-dismiss after 4 seconds
+    setTimeout(() => {
+        const elem = document.getElementById(notifId);
+        if (elem) {
+            elem.remove();
+        }
+    }, 4000);
+}
+
 function escapeHtml(value) {
     return String(value ?? '')
         .replace(/&/g, '&amp;')
@@ -19,12 +44,21 @@ function escapeHtml(value) {
         .replace(/'/g, '&#039;');
 }
 
+function getPoints(type) {
+    if (type === 'Minor Offense') return 1;
+    if (type === 'Major Offense') return 3;
+    if (type === 'Grave Offense') return 6;
+    return 0;
+}
+
+function isEligible(violations) {
+    return violations.reduce((sum, v) => sum + getPoints(v.type), 0) >= 5;
+}
+
+// ── Session Guards ────────────────────────────────────────────────────────────
+
 async function logoutForSecurity(reason = '') {
-    try {
-        await supabaseClient.auth.signOut();
-    } catch (e) {
-        console.warn('Sign out warning:', e);
-    }
+    try { await supabaseClient.auth.signOut(); } catch (e) { console.warn(e); }
     if (reason) alert(reason);
     window.location.href = 'login.html';
 }
@@ -43,10 +77,7 @@ function initSessionGuards() {
     document.addEventListener('visibilitychange', async () => {
         if (document.visibilityState === 'visible') {
             const { data: { session } } = await supabaseClient.auth.getSession();
-            if (!session) {
-                window.location.href = 'login.html';
-                return;
-            }
+            if (!session) { window.location.href = 'login.html'; return; }
             resetInactivityTimer();
         }
     });
@@ -58,21 +89,19 @@ function initSessionGuards() {
     resetInactivityTimer();
 }
 
-// Helper: Get points for violation type
-function getPoints(type) {
-    if (type === 'Minor Offense') return 1;
-    if (type === 'Major Offense') return 3;
-    if (type === 'Grave Offense') return 6;
-    return 0;
+// ── Realtime ──────────────────────────────────────────────────────────────────
+
+function initRealtimeSync() {
+    if (realtimeChannel) return;
+    realtimeChannel = supabaseClient
+        .channel('admin-dashboard-sync')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'students' }, () => loadDashboardData())
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'violations' }, () => loadDashboardData())
+        .subscribe();
 }
 
-// Helper: Check if student is eligible for suspension (points >=5)
-function isEligible(violations) {
-    const totalPoints = violations.reduce((sum, v) => sum + getPoints(v.type), 0);
-    return totalPoints >= 5;
-}
+// ── Dashboard Data ────────────────────────────────────────────────────────────
 
-// Load all students and violations, then update dashboard
 async function loadDashboardData() {
     try {
         const [studentsRes, violationsRes] = await Promise.all([
@@ -86,46 +115,29 @@ async function loadDashboardData() {
         const students = studentsRes.data;
         const violations = violationsRes.data;
 
-        // Update summary cards
         document.getElementById('totalStudents').innerText = students.length;
         document.getElementById('totalViolations').innerText = violations.length;
         const studentsWithViol = new Set(violations.map(v => v.student_id)).size;
         document.getElementById('studentsWithViolations').innerText = studentsWithViol;
 
-        // Eligible count
         let eligible = 0;
         for (let student of students) {
-            const studentViolations = violations.filter(v => v.student_id === student.id);
-            if (isEligible(studentViolations)) eligible++;
+            const sv = violations.filter(v => v.student_id === student.id);
+            if (isEligible(sv)) eligible++;
         }
         document.getElementById('eligibleCount').innerText = eligible;
 
-        // Update charts
         updateCharts(violations);
-
-        // Store data globally for dropdowns and other functions
         window.appData = { students, violations };
         populateStudentDropdowns(students);
         renderStudentAccounts(students, violations);
         renderUsersTable(students);
     } catch (err) {
         console.error('Error loading dashboard data:', err);
-        alert('Failed to load data. Check console.');
     }
 }
 
-function initRealtimeSync() {
-    if (realtimeChannel) return;
-    realtimeChannel = supabaseClient
-        .channel('admin-dashboard-sync')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'students' }, () => {
-            loadDashboardData();
-        })
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'violations' }, () => {
-            loadDashboardData();
-        })
-        .subscribe();
-}
+// ── Render Tables ─────────────────────────────────────────────────────────────
 
 function renderStudentAccounts(students, violations) {
     const tbody = document.getElementById('studentAccountsTableBody');
@@ -142,12 +154,27 @@ function renderStudentAccounts(students, violations) {
         violationCountByStudent.set(sid, (violationCountByStudent.get(sid) || 0) + 1);
     });
 
+    // Points per student for eligibility
+    const pointsByStudent = new Map();
+    (violations || []).forEach((v) => {
+        const sid = String(v.student_id ?? '');
+        pointsByStudent.set(sid, (pointsByStudent.get(sid) || 0) + getPoints(v.type));
+    });
+
     tbody.innerHTML = students.map((s) => {
         const sid = String(s.id ?? '');
         const count = violationCountByStudent.get(sid) || 0;
-        const status = count > 0
-            ? `<span class="badge bg-danger">Has Violations (${count})</span>`
-            : '<span class="badge bg-success">No Violations</span>';
+        const points = pointsByStudent.get(sid) || 0;
+        const eligible = points >= 5;
+
+        let status;
+        if (count === 0) {
+            status = '<span class="badge bg-success">No Violations</span>';
+        } else if (eligible) {
+            status = `<span class="badge bg-danger">Eligible for Suspension (${count} violations, ${points} pts)</span>`;
+        } else {
+            status = `<span class="badge bg-warning text-dark">Has Violations (${count}, ${points} pts)</span>`;
+        }
 
         return `<tr>
             <td>${escapeHtml(s.name || 'N/A')}</td>
@@ -169,7 +196,7 @@ function renderUsersTable(students) {
     }
 
     tbody.innerHTML = students.map((s) => {
-        const username = s.username || s.name || 'N/A';
+        const username = s.name || s.username || 'N/A';
         const email = s.email || 'N/A';
         const hasEmail = typeof s.email === 'string' && s.email.includes('@');
         const emailLink = hasEmail
@@ -179,9 +206,7 @@ function renderUsersTable(students) {
                     data-email="${escapeHtml(s.email)}"
                     data-username="${escapeHtml(username)}"
                     title="Email ${escapeHtml(username)}"
-               >
-                    <i class="bi bi-envelope"></i> Send Email
-               </button>`
+               ><i class="bi bi-envelope"></i> Send Email</button>`
             : '<span class="text-muted small">No email</span>';
         return `<tr>
             <td>${escapeHtml(username)}</td>
@@ -191,59 +216,19 @@ function renderUsersTable(students) {
     }).join('');
 }
 
-function getTemplateEmailContent(username) {
-    return {
-        subject: 'PhilTechGMA Notice',
-        body: `Hello ${username},\n\nThis is a reminder from PhilTechGMA Admin regarding your student account and handbook compliance.\n\nPlease check your dashboard for details and respond if assistance is needed.\n\nThank you,\nPhilTechGMA Admin`
-    };
-}
+// ── Charts ────────────────────────────────────────────────────────────────────
 
-function setComposeFields(mode) {
-    const subjectEl = document.getElementById('composeSubject');
-    const bodyEl = document.getElementById('composeBody');
-    if (!subjectEl || !bodyEl) return;
-
-    if (mode === 'template') {
-        const template = getTemplateEmailContent(selectedUsername || 'Student');
-        subjectEl.value = template.subject;
-        bodyEl.value = template.body;
-    } else {
-        subjectEl.value = '';
-        bodyEl.value = '';
-    }
-}
-
-function openComposeEmailModal(email, username) {
-    selectedEmail = email;
-    selectedUsername = username || 'Student';
-
-    const recipientEl = document.getElementById('composeRecipient');
-    const templateRadio = document.getElementById('messageTypeTemplate');
-    if (recipientEl) recipientEl.value = selectedEmail;
-    if (templateRadio) templateRadio.checked = true;
-
-    setComposeFields('template');
-    const modalEl = document.getElementById('composeEmailModal');
-    if (modalEl) bootstrap.Modal.getOrCreateInstance(modalEl).show();
-}
-
-// Update trend and pie charts
 function updateCharts(violations) {
-    // Trend: last 6 months
-    const months = [];
-    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     const today = new Date();
+    const months = [];
     for (let i = 5; i >= 0; i--) {
         const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
         months.push(monthNames[d.getMonth()]);
     }
-
-    const monthlyCounts = months.map(month => {
-        return violations.filter(v => {
-            const vDate = new Date(v.date);
-            return monthNames[vDate.getMonth()] === month;
-        }).length;
-    });
+    const monthlyCounts = months.map(month =>
+        violations.filter(v => monthNames[new Date(v.date).getMonth()] === month).length
+    );
 
     if (trendChart) {
         trendChart.data.datasets[0].data = monthlyCounts;
@@ -258,19 +243,18 @@ function updateCharts(violations) {
                     label: 'Violations',
                     data: monthlyCounts,
                     borderColor: '#800000',
-                    backgroundColor: 'rgba(128,0,0,0.05)',
-                    tension: 0.3,
+                    backgroundColor: 'rgba(128,0,0,0.06)',
+                    tension: 0.35,
                     fill: true,
                     pointBackgroundColor: '#FFD700',
                     pointBorderColor: '#800000',
                     pointRadius: 5
                 }]
             },
-            options: { responsive: true, maintainAspectRatio: true }
+            options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { display: false } } }
         });
     }
 
-    // Pie chart
     const types = ['Minor Offense', 'Major Offense', 'Grave Offense'];
     const typeCounts = types.map(t => violations.filter(v => v.type === t).length);
     if (typeChart) {
@@ -279,13 +263,14 @@ function updateCharts(violations) {
     } else {
         const ctxPie = document.getElementById('typeChart').getContext('2d');
         typeChart = new Chart(ctxPie, {
-            type: 'pie',
+            type: 'doughnut',
             data: {
                 labels: types,
                 datasets: [{
                     data: typeCounts,
-                    backgroundColor: ['#FFD700', '#800000', '#b84c4c'],
-                    borderWidth: 0
+                    backgroundColor: ['#FFD700', '#ea580c', '#800000'],
+                    borderWidth: 2,
+                    borderColor: '#fff'
                 }]
             },
             options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
@@ -293,168 +278,239 @@ function updateCharts(violations) {
     }
 }
 
-// Populate all student dropdowns
+// ── Dropdowns ─────────────────────────────────────────────────────────────────
+
 function populateStudentDropdowns(students) {
     const selects = ['violationStudentId', 'historyStudentId', 'eligibilityStudentId', 'reportStudentId'];
     const options = '<option value="">Select student</option>' +
-        students.map(s => `<option value="${s.id}">${s.name} (${s.id})</option>`).join('');
+        students.map(s => `<option value="${s.id}">${escapeHtml(s.name)} (${escapeHtml(s.id)})</option>`).join('');
     selects.forEach(id => {
         const sel = document.getElementById(id);
         if (sel) sel.innerHTML = options;
     });
 }
 
-// Search student
+// ── Search ────────────────────────────────────────────────────────────────────
+
 document.getElementById('searchBtn').addEventListener('click', async () => {
     const query = document.getElementById('searchInput').value.trim().toLowerCase();
     const resultDiv = document.getElementById('searchResult');
     if (!query) {
-        resultDiv.innerHTML = '<div class="alert alert-warning">Enter ID or name</div>';
+        resultDiv.innerHTML = '<div class="alert alert-warning py-2">Enter a student ID or name.</div>';
         return;
     }
     const { data: students, error } = await supabaseClient
         .from('students')
         .select('*')
         .or(`id.ilike.%${query}%,name.ilike.%${query}%`);
-    if (error) {
-        resultDiv.innerHTML = '<div class="alert alert-danger">Search failed</div>';
+
+    if (error || !students || students.length === 0) {
+        resultDiv.innerHTML = '<div class="alert alert-danger py-2">Student not found.</div>';
         return;
     }
-    if (students.length === 0) {
-        resultDiv.innerHTML = '<div class="alert alert-danger">Student not found</div>';
-        return;
-    }
+
     const student = students[0];
     const { data: violations } = await supabaseClient.from('violations').select('*').eq('student_id', student.id);
-    const violCount = violations ? violations.length : 0;
-    const hasViolations = violCount > 0;
-    const statusBadge = hasViolations
-        ? '<span class="badge bg-danger">Has Violations</span>'
-        : '<span class="badge bg-success">No Violations</span>';
-    resultDiv.innerHTML = `<div class="alert alert-success">${escapeHtml(student.name)} (${escapeHtml(student.id)})<br>Course: ${escapeHtml(student.course)} Y${escapeHtml(student.year)}<br>Violations: ${violCount} ${statusBadge}</div>`;
+    const points = (violations || []).reduce((s, v) => s + getPoints(v.type), 0);
+    const eligible = points >= 5;
+    const statusBadge = eligible
+        ? '<span class="badge bg-danger">Eligible for Suspension</span>'
+        : violations?.length > 0
+            ? '<span class="badge bg-warning text-dark">Has Violations</span>'
+            : '<span class="badge bg-success">No Violations</span>';
+
+    resultDiv.innerHTML = `
+        <div class="alert alert-success py-2 mb-0">
+            <strong>${escapeHtml(student.name)}</strong> (${escapeHtml(String(student.id))})<br>
+            ${escapeHtml(student.course)} · Year ${escapeHtml(String(student.year))}<br>
+            Violations: ${violations?.length || 0} &nbsp;|&nbsp; Points: ${points} &nbsp;${statusBadge}
+        </div>`;
 });
 
-// Record violation
+document.getElementById('searchInput').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') document.getElementById('searchBtn').click();
+});
+
+// ── Record Violation ──────────────────────────────────────────────────────────
+
 document.getElementById('violationForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const studentId = document.getElementById('violationStudentId').value;
     const type = document.getElementById('violationType').value;
     const date = document.getElementById('violationDate').value;
-    const description = document.getElementById('violationDesc').value;
+    const description = document.getElementById('violationDesc').value.trim();
 
     if (!studentId || !date || !description) {
-        alert('Please fill all fields');
+        alert('Please fill all fields.');
         return;
     }
 
+    const btn = e.target.querySelector('button[type="submit"]');
+    const orig = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Saving...';
+
     const { error } = await supabaseClient.from('violations').insert([{
         student_id: studentId,
-        type: type,
-        date: date,
-        description: description
+        type,
+        date,
+        description
     }]);
+
+    btn.disabled = false;
+    btn.innerHTML = orig;
 
     if (error) {
         alert('Error recording violation: ' + error.message);
         return;
     }
 
-    alert('Violation recorded');
+    alert('Violation recorded successfully.');
     document.getElementById('violationForm').reset();
+    document.getElementById('violationDate').value = new Date().toISOString().slice(0, 10);
     bootstrap.Modal.getInstance(document.getElementById('recordModal')).hide();
-    loadDashboardData(); // Refresh all data
+    loadDashboardData();
 });
 
-// Violation history
+// ── Violation History ─────────────────────────────────────────────────────────
+
 document.getElementById('historyStudentId').addEventListener('change', async (e) => {
     const sid = e.target.value;
     const container = document.getElementById('historyList');
-    if (!sid) {
-        container.innerHTML = '';
-        return;
-    }
+    if (!sid) { container.innerHTML = ''; return; }
+
     const { data: student } = await supabaseClient.from('students').select('*').eq('id', sid).single();
-    const { data: violations } = await supabaseClient.from('violations').select('*').eq('student_id', sid);
+    const { data: violations } = await supabaseClient.from('violations').select('*').eq('student_id', sid).order('date', { ascending: false });
+
     if (!violations || violations.length === 0) {
-        container.innerHTML = `<div class="alert alert-secondary">No violations for ${escapeHtml(student.name)}</div>`;
+        container.innerHTML = `<div class="alert alert-secondary">No violations recorded for <strong>${escapeHtml(student?.name || sid)}</strong>.</div>`;
         return;
     }
-    let html = `<table class="table table-sm table-bordered"><thead><tr><th>Date</th><th>Type</th><th>Description</th></tr></thead><tbody>`;
+
+    const totalPoints = violations.reduce((s, v) => s + getPoints(v.type), 0);
+    let html = `
+        <p class="mb-2"><strong>${escapeHtml(student?.name || sid)}</strong> &nbsp;·&nbsp; Total: ${violations.length} violation(s), <strong>${totalPoints} pts</strong></p>
+        <div class="table-responsive">
+        <table class="table table-sm table-bordered align-middle">
+            <thead><tr><th>Date</th><th>Type</th><th>Pts</th><th>Description</th></tr></thead>
+            <tbody>`;
+
     violations.forEach(v => {
-        html += `<tr><td>${escapeHtml(v.date)}</td><td>${escapeHtml(v.type)}</td><td>${escapeHtml(v.description)}</td></tr>`;
+        const pts = getPoints(v.type);
+        const typeColor = v.type === 'Minor Offense' ? '#d97706' : v.type === 'Major Offense' ? '#ea580c' : '#dc2626';
+        html += `<tr>
+            <td>${escapeHtml(v.date)}</td>
+            <td><span class="badge" style="background:${typeColor};">${escapeHtml(v.type)}</span></td>
+            <td><strong style="color:${typeColor};">+${pts}</strong></td>
+            <td>${escapeHtml(v.description)}</td>
+        </tr>`;
     });
-    html += `</tbody></table>`;
-    container.innerHTML = `<h6>${escapeHtml(student.name)} (${escapeHtml(student.id)})</h6>${html}`;
+
+    html += '</tbody></table></div>';
+    container.innerHTML = html;
 });
 
-// Suspension eligibility
+// ── Suspension Eligibility ────────────────────────────────────────────────────
+
 document.getElementById('eligibilityStudentId').addEventListener('change', async (e) => {
     const sid = e.target.value;
     const resultDiv = document.getElementById('eligibilityResult');
-    if (!sid) {
-        resultDiv.innerHTML = '';
-        return;
-    }
+    if (!sid) { resultDiv.innerHTML = ''; return; }
+
     const { data: student } = await supabaseClient.from('students').select('*').eq('id', sid).single();
     const { data: violations } = await supabaseClient.from('violations').select('*').eq('student_id', sid);
-    const totalPoints = violations.reduce((sum, v) => sum + getPoints(v.type), 0);
+    const totalPoints = (violations || []).reduce((s, v) => s + getPoints(v.type), 0);
     const eligible = totalPoints >= 5;
-    const minor = violations.filter(v => v.type === 'Minor Offense').length;
-    const major = violations.filter(v => v.type === 'Major Offense').length;
-    const grave = violations.filter(v => v.type === 'Grave Offense').length;
-    let reason = `Points: ${totalPoints} (Minor:${minor}, Major:${major}, Grave:${grave}). `;
-    reason += eligible ? 'ELIGIBLE for suspension.' : 'Not eligible.';
-    resultDiv.innerHTML = `<strong>${escapeHtml(student.name)}</strong><br>${escapeHtml(reason)}`;
-    resultDiv.className = eligible ? 'alert alert-danger' : 'alert alert-success';
+
+    const minor = (violations || []).filter(v => v.type === 'Minor Offense').length;
+    const major = (violations || []).filter(v => v.type === 'Major Offense').length;
+    const grave = (violations || []).filter(v => v.type === 'Grave Offense').length;
+
+    resultDiv.innerHTML = `
+        <strong>${escapeHtml(student?.name || sid)}</strong><br>
+        Points: <strong>${totalPoints}</strong> &nbsp;(Minor: ${minor}, Major: ${major}, Grave: ${grave})<br>
+        <strong>${eligible ? '⚠ ELIGIBLE for suspension.' : '✓ Not eligible for suspension.'}</strong>`;
+    resultDiv.className = `alert ${eligible ? 'alert-danger' : 'alert-success'}`;
 });
 
-// Report generation (CSV)
-document.getElementById('reportType').addEventListener('change', function() {
-    const studentDiv = document.getElementById('reportStudentDiv');
-    if (this.value === 'byStudent') studentDiv.classList.remove('d-none');
-    else studentDiv.classList.add('d-none');
+// ── Report Generation ─────────────────────────────────────────────────────────
+
+document.getElementById('reportType').addEventListener('change', function () {
+    document.getElementById('reportStudentDiv').classList.toggle('d-none', this.value !== 'byStudent');
 });
 
 document.getElementById('generateReportBtn').addEventListener('click', async () => {
     const type = document.getElementById('reportType').value;
-    let csv = "Student ID,Student Name,Violation Type,Date,Description\n";
+    let csv = 'Student ID,Student Name,Course,Year,Violation Type,Points,Date,Description\n';
 
     if (type === 'summary') {
-        const { data: violations } = await supabaseClient.from('violations').select('*, students(name)');
-        for (let v of violations) {
-            csv += `${v.student_id},"${v.students?.name || 'Unknown'}",${v.type},${v.date},"${v.description}"\n`;
+        const { data: violations } = await supabaseClient.from('violations').select('*, students(name, course, year)');
+        for (let v of (violations || [])) {
+            const pts = getPoints(v.type);
+            csv += `${v.student_id},"${v.students?.name || 'Unknown'}","${v.students?.course || ''}","${v.students?.year || ''}",${v.type},${pts},${v.date},"${v.description?.replace(/"/g, '""')}"\n`;
         }
     } else {
         const sid = document.getElementById('reportStudentId').value;
-        if (!sid) { alert('Select a student'); return; }
+        if (!sid) { alert('Please select a student.'); return; }
         const { data: student } = await supabaseClient.from('students').select('*').eq('id', sid).single();
         const { data: violations } = await supabaseClient.from('violations').select('*').eq('student_id', sid);
-        for (let v of violations) {
-            csv += `${v.student_id},"${student.name}",${v.type},${v.date},"${v.description}"\n`;
+        for (let v of (violations || [])) {
+            const pts = getPoints(v.type);
+            csv += `${v.student_id},"${student?.name || 'Unknown'}","${student?.course || ''}","${student?.year || ''}",${v.type},${pts},${v.date},"${v.description?.replace(/"/g, '""')}"\n`;
         }
     }
 
     const blob = new Blob([csv], { type: 'text/csv' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = `violation_report_${new Date().toISOString().slice(0,19)}.csv`;
+    link.download = `philtechgma_report_${new Date().toISOString().slice(0, 10)}.csv`;
     link.click();
     URL.revokeObjectURL(link.href);
     bootstrap.Modal.getInstance(document.getElementById('reportModal')).hide();
 });
 
-// Logout
-document.getElementById('logoutBtn').addEventListener('click', async () => {
-    await supabaseClient.auth.signOut();
-    window.location.href = 'login.html';
-});
+// ── Email Compose ─────────────────────────────────────────────────────────────
+
+function getTemplateEmailContent(username) {
+    return {
+        subject: 'PhilTechGMA – Official Student Notice',
+        body: `Dear ${username},\n\nThis is an official communication from the PhilTechGMA Administration regarding your student record and compliance with the Student Handbook.\n\nPlease log in to your Student Dashboard to review your violation history and current suspension eligibility status.\n\nIf you have questions or concerns, please visit the Office of Student Affairs.\n\nThank you for your attention to this matter.\n\nRespectfully,\nPhilTechGMA Administration\nCollege of Computer Studies`
+    };
+}
+
+function setComposeFields(mode) {
+    const subjectEl = document.getElementById('composeSubject');
+    const bodyEl = document.getElementById('composeBody');
+    if (!subjectEl || !bodyEl) return;
+
+    if (mode === 'template') {
+        const tpl = getTemplateEmailContent(selectedUsername || 'Student');
+        subjectEl.value = tpl.subject;
+        bodyEl.value = tpl.body;
+    } else {
+        subjectEl.value = '';
+        bodyEl.value = '';
+    }
+}
+
+function openComposeEmailModal(email, username) {
+    selectedEmail = email;
+    selectedUsername = username || 'Student';
+    const recipientEl = document.getElementById('composeRecipient');
+    const templateRadio = document.getElementById('messageTypeTemplate');
+    if (recipientEl) recipientEl.value = selectedEmail;
+    if (templateRadio) templateRadio.checked = true;
+    setComposeFields('template');
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('composeEmailModal')).show();
+}
 
 document.addEventListener('click', (e) => {
     const btn = e.target.closest('.send-email-btn');
     if (!btn) return;
-    const email = btn.getAttribute('data-email') || '';
-    const username = btn.getAttribute('data-username') || 'Student';
-    openComposeEmailModal(email, username);
+    openComposeEmailModal(
+        btn.getAttribute('data-email') || '',
+        btn.getAttribute('data-username') || 'Student'
+    );
 });
 
 document.getElementById('messageTypeTemplate')?.addEventListener('change', (e) => {
@@ -476,47 +532,44 @@ document.getElementById('sendEmailNowBtn')?.addEventListener('click', async () =
     alert('Please provide both subject and message.');
     return;
   }
-
+ 
   const sendBtn = document.getElementById('sendEmailNowBtn');
   const originalText = sendBtn?.innerHTML || '';
   if (sendBtn) {
     sendBtn.disabled = true;
     sendBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Sending...';
   }
-
+ 
   try {
-    const sendRequest = async (accessToken) => {
+    // Always get a fresh session first
+    const { data: sessionData, error: sessionError } = await supabaseClient.auth.getSession();
+ 
+    if (sessionError || !sessionData?.session) {
+      throw new Error('No active session. Please log in again.');
+    }
+ 
+    let accessToken = sessionData.session.access_token;
+ 
+    // Helper to call the edge function
+    const sendRequest = async (token) => {
       const response = await fetch(`${SUPABASE_URL}/functions/v1/send-student-email`, {
-        mode: 'cors',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          apikey: SUPABASE_ANON_KEY,
-          Authorization: `Bearer ${accessToken}`
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({ to: selectedEmail, subject, body })
+        body: JSON.stringify({ to: selectedEmail, subject, body }),
       });
-
+ 
       let payload = {};
-      try {
-        payload = await response.json();
-      } catch (_) {
-        payload = {};
-      }
+      try { payload = await response.json(); } catch (_) {}
       return { response, payload };
     };
-
-    let { data: sessionData, error: sessionError } = await supabaseClient.auth.getSession();
-let accessToken = sessionData?.session?.access_token;
-
-
-console.log('Session error:', sessionError);
-console.log('Access token exists:', !!accessToken);
-console.log('Token preview:', accessToken?.substring(0, 20));
-
+ 
     let { response, payload } = await sendRequest(accessToken);
-
-    // If token is stale, refresh once and retry.
+ 
+    // If token is stale (401), refresh once and retry
     if (response.status === 401) {
       const { data: refreshData, error: refreshError } = await supabaseClient.auth.refreshSession();
       if (refreshError || !refreshData?.session?.access_token) {
@@ -525,14 +578,15 @@ console.log('Token preview:', accessToken?.substring(0, 20));
       accessToken = refreshData.session.access_token;
       ({ response, payload } = await sendRequest(accessToken));
     }
-
+ 
     if (!response.ok) {
-      throw new Error(payload?.error || `HTTP ${response.status} while sending email.`);
+      throw new Error(payload?.error || `HTTP ${response.status}: ${JSON.stringify(payload)}`);
     }
-
-    alert(`Email sent successfully to ${selectedEmail}`);
+ 
+    alert(`✅ Email sent successfully to ${selectedEmail}`);
     const modalEl = document.getElementById('composeEmailModal');
     if (modalEl) bootstrap.Modal.getOrCreateInstance(modalEl).hide();
+ 
   } catch (err) {
     console.error('Email send error:', err);
     alert(`Email sending failed: ${err.message}`);
@@ -544,21 +598,28 @@ console.log('Token preview:', accessToken?.substring(0, 20));
   }
 });
 
-// Set default date in modal
-document.getElementById('violationDate').value = new Date().toISOString().slice(0,10);
+// ── Logout ────────────────────────────────────────────────────────────────────
 
-// Check authentication on page load
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+    if (realtimeChannel) await supabaseClient.removeChannel(realtimeChannel);
+    await supabaseClient.auth.signOut();
+    window.location.href = 'login.html';
+});
+
+// ── Auth Check ────────────────────────────────────────────────────────────────
+
 async function checkAuth() {
     const { data: { session }, error } = await supabaseClient.auth.getSession();
-    if (error || !session) {
-        window.location.href = 'login.html';
-        return;
-    }
+    if (error || !session) { window.location.href = 'login.html'; return; }
+
     if (session.user?.user_metadata?.role === 'student') {
         window.location.href = 'student-dashboard.html';
         return;
     }
+
     document.getElementById('adminEmail').innerText = session.user.email;
+    document.getElementById('violationDate').value = new Date().toISOString().slice(0, 10);
+
     initSessionGuards();
     initRealtimeSync();
     loadDashboardData();
