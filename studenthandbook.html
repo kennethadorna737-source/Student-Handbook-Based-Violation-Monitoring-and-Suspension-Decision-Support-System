@@ -15,7 +15,7 @@
     <!-- Handbook specific styles -->
     <link rel="stylesheet" href="styles/handbook.css">
 </head>
-<body>
+<body class="handbook-page">
     <div class="container py-4 py-md-5">
         <!-- Header with refined branding -->
         <div class="d-flex flex-wrap align-items-center justify-content-between mb-5 pb-2 border-bottom border-gold-30">
@@ -26,8 +26,10 @@
                     <div class="text-white-60 small">Academic Year 2025–2026 | Edition 2.0 | Official Code of Student Conduct</div>
                 </div>
             </div>
-            <div class="mt-2 mt-sm-0">
-                <a href="index.html" class="back-link me-4"><i class="fas fa-home me-1"></i> Institutional Portal</a>
+            <div class="mt-2 mt-sm-0 d-flex flex-wrap align-items-center gap-2">
+                <form action="index.html" method="get" class="d-inline mb-0">
+                    <button type="submit" class="btn-handbook-outline btn-sm-outline"><i class="fas fa-home me-1"></i> Institutional Portal</button>
+                </form>
                 <a href="login.html" class="btn-handbook-outline btn-sm-outline"><i class="fas fa-shield-alt me-1"></i> Administrator Access</a>
             </div>
         </div>
@@ -35,15 +37,15 @@
         <!-- Table of Contents (clean, professional grid) -->
         <div class="handbook-toc mb-5">
             <h5 class="text-gold mb-3 fw-semibold"><i class="fas fa-compass me-2"></i> Quick Reference</h5>
-            <div class="toc-grid">
-                <a href="#preamble" class="toc-item"><span class="toc-circle"></span><i class="fas fa-scroll me-2"></i>Preamble</a>
-                <a href="#general-policies" class="toc-item"><span class="toc-circle"></span><i class="fas fa-gavel me-2"></i>General Policies</a>
-                <a href="#offense-categories" class="toc-item"><span class="toc-circle"></span><i class="fas fa-scale-balanced me-2"></i>Offense Categories</a>
-                <a href="#sanction-matrix" class="toc-item"><span class="toc-circle"></span><i class="fas fa-table-cells-large me-2"></i>Sanction Matrix</a>
-                <a href="#cs-policies" class="toc-item"><span class="toc-circle"></span><i class="fas fa-microchip me-2"></i>CS Dept. Policies</a>
-                <a href="#disciplinary-process" class="toc-item"><span class="toc-circle"></span><i class="fas fa-scale-balanced me-2"></i>Due Process</a>
-                <a href="#retention" class="toc-item"><span class="toc-circle"></span><i class="fas fa-chart-line me-2"></i>Retention Policy</a>
-                <a href="#glossary" class="toc-item"><span class="toc-circle"></span><i class="fas fa-book-open me-2"></i>Glossary</a>
+            <div class="toc-grid d-flex flex-wrap gap-2">
+                <button type="button" class="btn btn-outline-warning btn-sm text-start toc-quick-ref" data-scroll-target="preamble"><i class="fas fa-scroll me-2"></i>Preamble</button>
+                <button type="button" class="btn btn-outline-warning btn-sm text-start toc-quick-ref" data-scroll-target="general-policies"><i class="fas fa-gavel me-2"></i>General Policies</button>
+                <button type="button" class="btn btn-outline-warning btn-sm text-start toc-quick-ref" data-scroll-target="offense-categories"><i class="fas fa-scale-balanced me-2"></i>Offense Categories</button>
+                <button type="button" class="btn btn-outline-warning btn-sm text-start toc-quick-ref" data-scroll-target="sanction-matrix"><i class="fas fa-table-cells-large me-2"></i>Sanction Matrix</button>
+                <button type="button" class="btn btn-outline-warning btn-sm text-start toc-quick-ref" data-scroll-target="cs-policies"><i class="fas fa-microchip me-2"></i>CS Dept. Policies</button>
+                <button type="button" class="btn btn-outline-warning btn-sm text-start toc-quick-ref" data-scroll-target="disciplinary-process"><i class="fas fa-scale-balanced me-2"></i>Due Process</button>
+                <button type="button" class="btn btn-outline-warning btn-sm text-start toc-quick-ref" data-scroll-target="retention"><i class="fas fa-chart-line me-2"></i>Retention Policy</button>
+                <button type="button" class="btn btn-outline-warning btn-sm text-start toc-quick-ref" data-scroll-target="glossary"><i class="fas fa-book-open me-2"></i>Glossary</button>
             </div>
         </div>
 
@@ -88,7 +90,7 @@
                     <div class="row g-4 mt-3">
                         <div class="col-md-4">
                             <div class="offense-card offense-minor">
-                                <h4 class="text-gold fs-5 fw-semibold"><i class="fas fa-circle-info me-1"></i> Class A – Minor Infractions</h4>
+                                <h4 class="text-gold fs-5 fw-semibold"><i class="fas fa-circle-info me-1"></i> Category A</h4>
                                 <p class="small text-white-80">Generally result in corrective measures such as warnings, reflective essays, or community service. Sanctions escalate only upon repetition within the same semester.</p>
                                 <ul class="list-gold-bullet small">
                                     <li>Repeated tardiness (three or more incidents per month)</li>
@@ -101,7 +103,7 @@
                         </div>
                         <div class="col-md-4">
                             <div class="offense-card offense-serious">
-                                <h4 class="text-gold fs-5 fw-semibold"><i class="fas fa-triangle-exclamation me-1"></i> Class B – Serious Offenses</h4>
+                                <h4 class="text-gold fs-5 fw-semibold"><i class="fas fa-triangle-exclamation me-1"></i> Category B</h4>
                                 <p class="small text-white-80">Carry probationary status, mandatory parental conferences, and suspension ranging from one (1) to five (5) days. Records remain active for two semesters.</p>
                                 <ul class="list-gold-bullet small">
                                     <li>Cheating or plagiarism (first documented instance)</li>
@@ -115,7 +117,7 @@
                         </div>
                         <div class="col-md-4">
                             <div class="offense-card offense-grave">
-                                <h4 class="text-gold fs-5 fw-semibold"><i class="fas fa-skull me-1"></i> Class C – Grave Offenses</h4>
+                                <h4 class="text-gold fs-5 fw-semibold"><i class="fas fa-skull me-1"></i> Category C</h4>
                                 <p class="small text-white-80">Warrant immediate preventive suspension, formal hearing, and possible expulsion. Permanent annotation on academic records.</p>
                                 <ul class="list-gold-bullet small">
                                     <li>Physical assault, severe bullying, or hazing</li>
@@ -147,21 +149,21 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td><span class="badge-gold">Class A — Minor</span></td>
+                                    <td><span class="badge-gold">Category A</span></td>
                                     <td>Verbal warning + written reflection essay <span class="small text-white-50 d-block">(recorded in violation log)</span></td>
                                     <td>Written warning + 2 days community service <span class="small text-white-50 d-block">parent notification</span></td>
                                     <td>Parent conference + 1-day suspension <span class="small text-white-50 d-block">probation (1 month)</span></td>
                                     <td>3-day suspension + 10 hours community service</td>
                                 </tr>
                                 <tr>
-                                    <td><span class="badge-gold">Class B — Serious</span></td>
+                                    <td><span class="badge-gold">Category B</span></td>
                                     <td>Probation (1 month) + 3-day suspension <span class="small text-white-50 d-block">reflection paper required</span></td>
                                     <td>Extended probation (1 semester) + 5-day suspension <span class="small text-white-50 d-block">mandatory counseling</span></td>
                                     <td>10-day suspension & loss of privileges <span class="small text-white-50 d-block">dismissal warning issued</span></td>
                                     <td>Semester suspension / recommendation for dismissal</td>
                                 </tr>
                                 <tr>
-                                    <td><span class="badge-gold">Class C — Grave</span></td>
+                                    <td><span class="badge-gold">Category C</span></td>
                                     <td>Immediate 10-day preventive suspension + formal hearing <span class="small text-white-50 d-block">investigation period</span></td>
                                     <td>Semester suspension + mandatory formation program</td>
                                     <td>Expulsion (permanent record, institutional blacklist)</td>
@@ -293,10 +295,9 @@
     </div>
 
     <script>
-        document.querySelectorAll('.handbook-toc a').forEach(anchor => {
-            anchor.addEventListener('click', function(e) {
-                e.preventDefault();
-                const targetId = this.getAttribute('href').substring(1);
+        document.querySelectorAll('.handbook-toc button[data-scroll-target]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-scroll-target');
                 const target = document.getElementById(targetId);
                 if (target) {
                     target.scrollIntoView({ behavior: 'smooth', block: 'start' });

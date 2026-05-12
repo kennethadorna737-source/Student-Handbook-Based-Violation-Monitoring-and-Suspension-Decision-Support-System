@@ -2,9 +2,6 @@
 const SUPABASE_URL = 'https://psoxppumeihdanqrgyzh.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzb3hwcHVtZWloZGFucXJneXpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5NzY4MzMsImV4cCI6MjA4OTU1MjgzM30.mnHWnufKUbo3asRBmnwTnjLU4-SIVtF8QoIBSrJSWuA';
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-const MAX_LOGIN_ATTEMPTS = 5;
-const LOCKOUT_MINUTES = 10;
-const LOGIN_GUARD_KEY = 'admin_login_guard_v1';
 
 function getUserRole(session) {
     return session?.user?.user_metadata?.role || 'admin';
@@ -17,18 +14,6 @@ function redirectByRole(session) {
         return;
     }
     window.location.href = 'dashboard.html';
-}
-
-function getLoginGuardState() {
-    try {
-        return JSON.parse(localStorage.getItem(LOGIN_GUARD_KEY)) || { attempts: 0, lockUntil: 0 };
-    } catch {
-        return { attempts: 0, lockUntil: 0 };
-    }
-}
-
-function setLoginGuardState(state) {
-    localStorage.setItem(LOGIN_GUARD_KEY, JSON.stringify(state));
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -77,13 +62,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const now = Date.now();
-        const guard = getLoginGuardState();
-        if (guard.lockUntil && now < guard.lockUntil) {
-            const minsLeft = Math.ceil((guard.lockUntil - now) / 60000);
-            alert(`Too many login attempts. Please wait ${minsLeft} minute(s) before trying again.`);
-            return;
-        }
 
         let isValid = true;
 
@@ -123,20 +101,11 @@ document.addEventListener('DOMContentLoaded', function() {
             if (error) throw error;
 
             if (data.session) {
-                setLoginGuardState({ attempts: 0, lockUntil: 0 });
                 redirectByRole(data.session);
             } else {
                 throw new Error('Login failed');
             }
         } catch (err) {
-            const current = getLoginGuardState();
-            const attempts = (current.attempts || 0) + 1;
-            const shouldLock = attempts >= MAX_LOGIN_ATTEMPTS;
-            setLoginGuardState({
-                attempts: shouldLock ? 0 : attempts,
-                lockUntil: shouldLock ? Date.now() + LOCKOUT_MINUTES * 60000 : 0
-            });
-
             const demoAlert = document.createElement('div');
             demoAlert.className = 'alert alert-danger mt-3 text-center';
             demoAlert.innerHTML = `<strong>Access denied</strong> — Invalid email or password.<br>Please verify your credentials and try again.`;

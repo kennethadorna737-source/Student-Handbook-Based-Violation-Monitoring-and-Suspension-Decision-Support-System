@@ -1,0 +1,33 @@
+/* Full-width column layout: landing.css uses body { display:flex } which breaks
+   multi-section pages if siblings sit outside .container (side-by-side “sidebar”). */
+body.handbook-page {
+    display: block;
+    width: 100%;
+    min-height: 100vh;
+    align-items: unset;
+    justify-content: unset;
+}
+
+/* Student handbook — Quick Reference as gold-outline buttons */
+.handbook-toc .toc-quick-ref {
+    color: #FFD700;
+    border-color: rgba(255, 215, 0, 0.65);
+    background: rgba(0, 0, 0, 0.15);
+}
+
+.handbook-toc .toc-quick-ref:hover {
+    color: #800000;
+    background: #FFD700;
+    border-color: #FFD700;
+}
+
+.handbook-toc .toc-quick-ref:focus-visible {
+    box-shadow: 0 0 0 0.2rem rgba(255, 215, 0, 0.45);
+}
+
+/* Header: Institutional Portal as <button> matches outline control styling */
+button.btn-handbook-outline {
+    cursor: pointer;
+    font-family: inherit;
+    line-height: inherit;
+}

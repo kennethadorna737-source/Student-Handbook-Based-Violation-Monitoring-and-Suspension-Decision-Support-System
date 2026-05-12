@@ -2,22 +2,6 @@ const SUPABASE_URL = 'https://psoxppumeihdanqrgyzh.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzb3hwcHVtZWloZGFucXJneXpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5NzY4MzMsImV4cCI6MjA4OTU1MjgzM30.mnHWnufKUbo3asRBmnwTnjLU4-SIVtF8QoIBSrJSWuA';
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-const MAX_LOGIN_ATTEMPTS = 5;
-const LOCKOUT_MINUTES = 10;
-const LOGIN_GUARD_KEY = 'student_login_guard_v1';
-
-function getLoginGuardState() {
-    try {
-        return JSON.parse(localStorage.getItem(LOGIN_GUARD_KEY)) || { attempts: 0, lockUntil: 0 };
-    } catch {
-        return { attempts: 0, lockUntil: 0 };
-    }
-}
-
-function setLoginGuardState(state) {
-    localStorage.setItem(LOGIN_GUARD_KEY, JSON.stringify(state));
-}
-
 document.addEventListener('DOMContentLoaded', function () {
     // Redirect if already logged in as student
     supabaseClient.auth.getSession().then(({ data: { session } }) => {
@@ -70,14 +54,6 @@ document.addEventListener('DOMContentLoaded', function () {
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const now = Date.now();
-        const guard = getLoginGuardState();
-        if (guard.lockUntil && now < guard.lockUntil) {
-            const minsLeft = Math.ceil((guard.lockUntil - now) / 60000);
-            alert(`Too many login attempts. Please wait ${minsLeft} minute(s) before trying again.`);
-            return;
-        }
-
         const emailVal = emailInput.value.trim();
         const passVal = passwordInput.value;
         let isValid = true;
@@ -116,7 +92,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (data.session) {
                 const role = data.session.user?.user_metadata?.role;
-                setLoginGuardState({ attempts: 0, lockUntil: 0 });
 
                 if (role !== 'student') {
                     // Admin logged in via student portal — redirect to admin
@@ -128,14 +103,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 throw new Error('Login failed. No session returned.');
             }
         } catch (err) {
-            const current = getLoginGuardState();
-            const attempts = (current.attempts || 0) + 1;
-            const shouldLock = attempts >= MAX_LOGIN_ATTEMPTS;
-            setLoginGuardState({
-                attempts: shouldLock ? 0 : attempts,
-                lockUntil: shouldLock ? Date.now() + LOCKOUT_MINUTES * 60000 : 0,
-            });
-
             const existingAlert = form.querySelector('.alert-danger');
             if (existingAlert) existingAlert.remove();
 
