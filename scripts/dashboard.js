@@ -44,6 +44,20 @@ function escapeHtml(value) {
         .replace(/'/g, '&#039;');
 }
 
+function formatStudentId(student) {
+    const rawDate = student?.created_at ? new Date(student.created_at) : null;
+    const validDate = rawDate && !Number.isNaN(rawDate.getTime()) ? rawDate : new Date();
+    const yyyy = validDate.getFullYear();
+    const mm = String(validDate.getMonth() + 1).padStart(2, '0');
+    const dd = String(validDate.getDate()).padStart(2, '0');
+    const createdDate = `${yyyy}${mm}${dd}`;
+
+    const yearPart = String(student?.year || 'NA').trim();
+    const coursePart = String(student?.course || 'NA').trim().replace(/\s+/g, '');
+
+    return `${createdDate}-${yearPart}${coursePart}`;
+}
+
 function normalizeViolationType(type) {
     const value = String(type || '').trim().toLowerCase();
     if (value === 'category a' || value === 'minor offense') return 'Category A';
@@ -172,6 +186,7 @@ function renderStudentAccounts(students, violations) {
 
     tbody.innerHTML = students.map((s) => {
         const sid = String(s.id ?? '');
+        const formattedStudentId = formatStudentId(s);
         const count = violationCountByStudent.get(sid) || 0;
         const points = pointsByStudent.get(sid) || 0;
         const eligible = points >= 5;
@@ -187,7 +202,7 @@ function renderStudentAccounts(students, violations) {
 
         return `<tr>
             <td>${escapeHtml(s.name || 'N/A')}</td>
-            <td>${escapeHtml(sid || 'N/A')}</td>
+            <td>${escapeHtml(formattedStudentId || 'N/A')}</td>
             <td>${escapeHtml(s.course || 'N/A')}</td>
             <td>${escapeHtml(s.year || 'N/A')}</td>
             <td>${status}</td>
@@ -292,7 +307,10 @@ function updateCharts(violations) {
 function populateStudentDropdowns(students) {
     const selects = ['violationStudentId', 'historyStudentId', 'eligibilityStudentId', 'reportStudentId'];
     const options = '<option value="">Select student</option>' +
-        students.map(s => `<option value="${s.id}">${escapeHtml(s.name)} (${escapeHtml(s.id)})</option>`).join('');
+        students.map((s) => {
+            const formattedStudentId = formatStudentId(s);
+            return `<option value="${s.id}">${escapeHtml(s.name)} (${escapeHtml(formattedStudentId)})</option>`;
+        }).join('');
     selects.forEach(id => {
         const sel = document.getElementById(id);
         if (sel) sel.innerHTML = options;
@@ -310,15 +328,24 @@ document.getElementById('searchBtn').addEventListener('click', async () => {
     }
     const { data: students, error } = await supabaseClient
         .from('students')
-        .select('*')
-        .or(`id.ilike.%${query}%,name.ilike.%${query}%`);
+        .select('*');
 
-    if (error || !students || students.length === 0) {
+    if (error || !students) {
+        resultDiv.innerHTML = '<div class="alert alert-danger py-2">Could not load students.</div>';
+        return;
+    }
+
+    const student = students.find((s) => {
+        const nameMatch = String(s.name || '').toLowerCase().includes(query);
+        const formattedIdMatch = formatStudentId(s).toLowerCase().includes(query);
+        return nameMatch || formattedIdMatch;
+    });
+
+    if (!student) {
         resultDiv.innerHTML = '<div class="alert alert-danger py-2">Student not found.</div>';
         return;
     }
 
-    const student = students[0];
     const { data: violations } = await supabaseClient.from('violations').select('*').eq('student_id', student.id);
     const points = (violations || []).reduce((s, v) => s + getPoints(v.type), 0);
     const eligible = points >= 5;
@@ -330,7 +357,7 @@ document.getElementById('searchBtn').addEventListener('click', async () => {
 
     resultDiv.innerHTML = `
         <div class="alert alert-success py-2 mb-0">
-            <strong>${escapeHtml(student.name)}</strong> (${escapeHtml(String(student.id))})<br>
+            <strong>${escapeHtml(student.name)}</strong> (${escapeHtml(formatStudentId(student))})<br>
             ${escapeHtml(student.course)} · Year ${escapeHtml(String(student.year))}<br>
             Violations: ${violations?.length || 0} &nbsp;|&nbsp; Points: ${points} &nbsp;${statusBadge}
         </div>`;
