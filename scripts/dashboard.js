@@ -44,10 +44,19 @@ function escapeHtml(value) {
         .replace(/'/g, '&#039;');
 }
 
+function normalizeViolationType(type) {
+    const value = String(type || '').trim().toLowerCase();
+    if (value === 'category a' || value === 'minor offense') return 'Category A';
+    if (value === 'category b' || value === 'major offense') return 'Category B';
+    if (value === 'category c' || value === 'grave offense') return 'Category C';
+    return String(type || '').trim();
+}
+
 function getPoints(type) {
-    if (type === 'Category A') return 1;
-    if (type === 'Category B') return 3;
-    if (type === 'Category C') return 6;
+    const normalizedType = normalizeViolationType(type);
+    if (normalizedType === 'Category A') return 1;
+    if (normalizedType === 'Category B') return 3;
+    if (normalizedType === 'Category C') return 6;
     return 0;
 }
 
@@ -256,7 +265,7 @@ function updateCharts(violations) {
     }
 
     const types = ['Category A', 'Category B', 'Category C'];
-    const typeCounts = types.map(t => violations.filter(v => v.type === t).length);
+    const typeCounts = types.map(t => violations.filter(v => normalizeViolationType(v.type) === t).length);
     if (typeChart) {
         typeChart.data.datasets[0].data = typeCounts;
         typeChart.update();
@@ -396,11 +405,12 @@ document.getElementById('historyStudentId').addEventListener('change', async (e)
             <tbody>`;
 
     violations.forEach(v => {
-        const pts = getPoints(v.type);
-        const typeColor = v.type === 'Category A' ? '#d97706' : v.type === 'Category B' ? '#ea580c' : '#dc2626';
+        const normalizedType = normalizeViolationType(v.type);
+        const pts = getPoints(normalizedType);
+        const typeColor = normalizedType === 'Category A' ? '#d97706' : normalizedType === 'Category B' ? '#ea580c' : '#dc2626';
         html += `<tr>
             <td>${escapeHtml(v.date)}</td>
-            <td><span class="badge" style="background:${typeColor};">${escapeHtml(v.type)}</span></td>
+            <td><span class="badge" style="background:${typeColor};">${escapeHtml(normalizedType || v.type)}</span></td>
             <td><strong style="color:${typeColor};">+${pts}</strong></td>
             <td>${escapeHtml(v.description)}</td>
         </tr>`;
@@ -422,9 +432,9 @@ document.getElementById('eligibilityStudentId').addEventListener('change', async
     const totalPoints = (violations || []).reduce((s, v) => s + getPoints(v.type), 0);
     const eligible = totalPoints >= 5;
 
-    const categoryA = (violations || []).filter(v => v.type === 'Category A').length;
-    const categoryB = (violations || []).filter(v => v.type === 'Category B').length;
-    const categoryC = (violations || []).filter(v => v.type === 'Category C').length;
+    const categoryA = (violations || []).filter(v => normalizeViolationType(v.type) === 'Category A').length;
+    const categoryB = (violations || []).filter(v => normalizeViolationType(v.type) === 'Category B').length;
+    const categoryC = (violations || []).filter(v => normalizeViolationType(v.type) === 'Category C').length;
 
     resultDiv.innerHTML = `
         <strong>${escapeHtml(student?.name || sid)}</strong><br>
