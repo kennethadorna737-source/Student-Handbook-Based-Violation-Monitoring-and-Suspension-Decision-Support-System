@@ -45,9 +45,9 @@ function escapeHtml(value) {
 }
 
 function getPoints(type) {
-    if (type === 'Minor Offense') return 1;
-    if (type === 'Major Offense') return 3;
-    if (type === 'Grave Offense') return 6;
+    if (type === 'Category A') return 1;
+    if (type === 'Category B') return 3;
+    if (type === 'Category C') return 6;
     return 0;
 }
 
@@ -255,7 +255,7 @@ function updateCharts(violations) {
         });
     }
 
-    const types = ['Minor Offense', 'Major Offense', 'Grave Offense'];
+    const types = ['Category A', 'Category B', 'Category C'];
     const typeCounts = types.map(t => violations.filter(v => v.type === t).length);
     if (typeChart) {
         typeChart.data.datasets[0].data = typeCounts;
@@ -397,7 +397,7 @@ document.getElementById('historyStudentId').addEventListener('change', async (e)
 
     violations.forEach(v => {
         const pts = getPoints(v.type);
-        const typeColor = v.type === 'Minor Offense' ? '#d97706' : v.type === 'Major Offense' ? '#ea580c' : '#dc2626';
+        const typeColor = v.type === 'Category A' ? '#d97706' : v.type === 'Category B' ? '#ea580c' : '#dc2626';
         html += `<tr>
             <td>${escapeHtml(v.date)}</td>
             <td><span class="badge" style="background:${typeColor};">${escapeHtml(v.type)}</span></td>
@@ -422,13 +422,13 @@ document.getElementById('eligibilityStudentId').addEventListener('change', async
     const totalPoints = (violations || []).reduce((s, v) => s + getPoints(v.type), 0);
     const eligible = totalPoints >= 5;
 
-    const minor = (violations || []).filter(v => v.type === 'Minor Offense').length;
-    const major = (violations || []).filter(v => v.type === 'Major Offense').length;
-    const grave = (violations || []).filter(v => v.type === 'Grave Offense').length;
+    const categoryA = (violations || []).filter(v => v.type === 'Category A').length;
+    const categoryB = (violations || []).filter(v => v.type === 'Category B').length;
+    const categoryC = (violations || []).filter(v => v.type === 'Category C').length;
 
     resultDiv.innerHTML = `
         <strong>${escapeHtml(student?.name || sid)}</strong><br>
-        Points: <strong>${totalPoints}</strong> &nbsp;(Minor: ${minor}, Major: ${major}, Grave: ${grave})<br>
+        Points: <strong>${totalPoints}</strong> &nbsp;(Category A: ${categoryA}, Category B: ${categoryB}, Category C: ${categoryC})<br>
         <strong>${eligible ? '⚠ ELIGIBLE for suspension.' : '✓ Not eligible for suspension.'}</strong>`;
     resultDiv.className = `alert ${eligible ? 'alert-danger' : 'alert-success'}`;
 });

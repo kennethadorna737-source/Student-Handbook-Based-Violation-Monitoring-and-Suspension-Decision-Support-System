@@ -11,9 +11,9 @@ let currentStudentId = null;
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 function getPoints(type) {
-    if (type === 'Minor Offense') return 1;
-    if (type === 'Major Offense') return 3;
-    if (type === 'Grave Offense') return 6;
+    if (type === 'Category A') return 1;
+    if (type === 'Category B') return 3;
+    if (type === 'Category C') return 6;
     return 0;
 }
 
@@ -113,14 +113,14 @@ function renderViolations(violations) {
         .sort((a, b) => new Date(b.date) - new Date(a.date))
         .map((v) => {
             const points = getPoints(v.type);
-            const badgeClass = v.type === 'Minor Offense'
+            const badgeClass = v.type === 'Category A'
                 ? 'bg-warning text-dark'
-                : v.type === 'Major Offense'
+                : v.type === 'Category B'
                     ? 'bg-orange text-white'
                     : 'bg-danger text-white';
-            const typeColor = v.type === 'Minor Offense'
+            const typeColor = v.type === 'Category B'
                 ? '#d97706'
-                : v.type === 'Major Offense'
+                : v.type === 'Category C'
                     ? '#ea580c'
                     : '#dc2626';
             return `
